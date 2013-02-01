@@ -216,7 +216,7 @@ DrawR.prototype.hideLayer = function (layer) {
  * @return {number} the calculated canvas x-position
  */
 DrawR.prototype.transformX = function (x) {
-    return Math.round((x - this.surface.offset().left) * this.options.width / this.surface[0].clientWidth);
+    return Math.round(x * this.options.width / this.surface[0].clientWidth);
 };
 
 /**
@@ -227,7 +227,7 @@ DrawR.prototype.transformX = function (x) {
  * @return {number} the calculated canvas y-position
  */
 DrawR.prototype.transformY = function (y) {
-    return Math.round((y - this.surface.offset().top) * this.options.height / this.surface[0].clientHeight);
+    return Math.round(y * this.options.height / this.surface[0].clientHeight);
 };
 
 /**
@@ -242,7 +242,7 @@ DrawR.prototype.bindEvents = function () {
         $this.surface.on('MSPointerDown', function (evt) {
             evt.preventDefault();
             evt = evt.originalEvent;
-            $this.touchStart({ x: evt.pageX, y: evt.pageY, identifier: evt.pointerId, force: evt.pressure });
+            $this.touchStart({ x: evt.offsetX, y: evt.offsetY, identifier: evt.pointerId, force: evt.pressure });
 
             $this.globalSurface.one('MSPointerUp MSPointerOut', function (evt) {
                 evt = evt.originalEvent;
@@ -254,16 +254,17 @@ DrawR.prototype.bindEvents = function () {
             evt = evt.originalEvent;
             if (!$this.modifyOperations[evt.pointerId]) return;
 
-            $this.touchMove({ identifier: evt.pointerId, x: evt.pageX, y: evt.pageY, force: evt.pressure });
+            $this.touchMove({ identifier: evt.pointerId, x: evt.offsetX, y: evt.offsetY, force: evt.pressure });
         });
     } else {
         $this.surface.on('touchstart', function (evt) {
             evt.preventDefault();
             evt = evt.originalEvent;
+            var offset = $this.surface.offset();
 
             for (var i = 0; i < evt.changedTouches.length; ++i) {
                 var touch = evt.changedTouches[i];
-                $this.touchStart({ x: touch.pageX, y: touch.pageY, identifier: touch.identifier, force: touch.webkitForce || touch.force });
+                $this.touchStart({ x: touch.pageX - offset.left, y: touch.pageY - offset.top, identifier: touch.identifier, force: touch.webkitForce || touch.force });
             }
 
             $this.surface.one('touchend touchleave touchcancel', function (evt) {
@@ -275,7 +276,7 @@ DrawR.prototype.bindEvents = function () {
             if (evt.which !== 1) return;
 
             evt.preventDefault();
-            $this.touchStart({ x: evt.pageX, y: evt.pageY, identifier: -1, force: 0 });
+            $this.touchStart({ x: evt.offsetX, y: evt.offsetY, identifier: -1, force: 0 });
 
             $this.globalSurface.one('mouseup mouseleave', function (evt) {
                 $this.touchEnd({ identifier: -1 });
@@ -285,19 +286,20 @@ DrawR.prototype.bindEvents = function () {
         $this.globalSurface.on('touchmove', function (evt) {
             evt.preventDefault();
             evt = evt.originalEvent;
+            var offset = $this.surface.offset();
 
             for (var i = 0; i < evt.changedTouches.length; ++i) {
                 var touch = evt.changedTouches[i];
                 if (!$this.modifyOperations[touch.identifier]) continue;
 
-                $this.touchMove({ x: touch.pageX, y: touch.pageY, identifier: touch.identifier, force: touch.webkitForce || touch.force });
+                $this.touchMove({ x: touch.pageX - offset.left, y: touch.pageY - offset.top, identifier: touch.identifier, force: touch.webkitForce || touch.force });
             }
         }).on('mousemove', function (evt) {
             if (!$this.modifyOperations[-1]) return;
 
             evt.preventDefault();
 
-            $this.touchMove({ x: evt.pageX, y: evt.pageY, identifier: -1, force: 0 });
+            $this.touchMove({ x: evt.offsetX, y: evt.offsetY, identifier: -1, force: 0 });
         })
     }
 };
