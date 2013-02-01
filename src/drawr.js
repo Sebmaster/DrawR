@@ -55,6 +55,12 @@ DrawR.BrushModes = {
 	BUCKET: 'Bucket'
 };
 
+(function() {
+	var y = new Uint32Array([1]);
+	var x = new Uint8Array(y.buffer);
+	DrawR.littleEndian = x[0] === 1;
+})();
+
 DrawR.hsvToRgb = function(h, s, v) {
 	h = h / 60;
     var i = Math.floor(h);
@@ -564,12 +570,13 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
     col[2] = parseInt(drawStyle.substr(5, 2), 16);
 
     var data = this.activeLayer.canvasData.data;
+    if (self.CanvasPixelArray && data instanceof self.CanvasPixelArray) { // IE hack because data is an array
+    	data = new Uint8Array(data);
+    }
     var target = new Int32Array(data.buffer);
-    var oldVal = target[0];
     var finalCol;
     
-    target[0] = 0x0a;
-    if (data[0] === 0x0a) {
+    if (DrawR.littleEndian) {
 		finalCol = (
 			(255 << 24) |
 			(col[2] << 16) |
@@ -578,14 +585,12 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
 		);
 	} else {
 		finalCol = (
-			(255 << 24) |
-			(col[2] << 16) |
-			(col[1] << 8) |
-			 col[0]
+			255 |
+			(col[2] << 8) |
+			(col[1] << 16) |
+			(col[0] << 24)
 		);
 	}
-	
-	target[0] = oldVal;
 
     var touchPoint = touchPoints[touchPoints.length - 1];
 
@@ -628,6 +633,19 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
         }
     }
 
+	if (self.CanvasPixelArray && this.activeLayer.canvasData.data instanceof self.CanvasPixelArray) {
+		var backData = this.activeLayer.canvasData.data;
+		
+		for (var i=minY; i <= maxY + 1; ++i) {
+			for (var j=minX; j <= maxX + 1; ++j) {
+				var pos = j + i * width * 4;
+				backData[pos] = data[pos];
+				backData[pos + 1] = data[pos + 1];
+				backData[pos + 2] = data[pos + 2];
+				backData[pos + 3] = data[pos + 3];
+			}
+		}
+	}
     this.activeLayer.ctx.putImageData(this.activeLayer.canvasData, 0, 0, minX, minY, maxX - minX + 1, maxY - minY + 1);
     
     return {minX: minX,
