@@ -254,7 +254,7 @@ DrawR.prototype.bindEvents = function () {
             evt = evt.originalEvent;
             if (!$this.modifyOperations[evt.pointerId]) return;
 
-            $this.touchMove({ identifier: evt.pointerId, x: evt.pageX, y: evt.pageY, intensity: evt.pressure });
+            $this.touchMove({ identifier: evt.pointerId, x: evt.pageX, y: evt.pageY, force: evt.pressure });
         });
     } else {
         $this.surface.on('touchstart', function (evt) {
