@@ -43,6 +43,9 @@ function DrawR(surface, globalSurface, options) {
     this.bindEvents();
 }
 
+/** @typedef {{ctx: CanvasRenderingContext2D, visible: boolean, blendMode: string, opacity: number, canvasData: ImageData}} */
+DrawR.Layer;
+
 /**
  * @enum {string}
  */
@@ -112,13 +115,25 @@ DrawR.rgbToHsv = function(r, g, b) {
     return hsv;
 };
 
-/** @type {string} */
+/**
+ * Defines the color in which the active drawMode draws.
+ * @type {string}
+ */
 DrawR.prototype.foregroundColor = '#000000';
 /** @type {DrawR.BrushModes} */
 DrawR.prototype.drawMode = DrawR.BrushModes.BRUSH;
-/** @type {number} */
+/**
+ * @private
+ * @type {number}
+ */
 DrawR.prototype.touches = 0;
 
+/**
+ * Adds a new layer at the specified index.
+ * 
+ * @param {number} idx the index to add the layer at
+ * @return {DrawR.Layer}
+ */
 DrawR.prototype.addLayer = function(idx) {
 	var startCanvas = jQuery('<canvas>').prop({ width: this.options.width, height: this.options.height });
 	
@@ -142,6 +157,12 @@ DrawR.prototype.addLayer = function(idx) {
     return layer;
 };
 
+/**
+ * Toggles the active layer.
+ * If the given layer is currently active, it will be set to inactive.
+ * 
+ * @param {DrawR.Layer} layer the layer to toggle
+ */
 DrawR.prototype.toggleActive = function(layer) {
     if (this.activeLayer === layer) {
         this.activeLayer = null;
