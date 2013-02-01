@@ -92,7 +92,7 @@ DrawR.rgbToHsv = function(r, g, b) {
     
     if (delta === 0) return hsv;
     
-    hsv.s = detla / max;
+    hsv.s = delta / max;
     
     if (max === r) {
         hsv.h = (g - b) / delta;
