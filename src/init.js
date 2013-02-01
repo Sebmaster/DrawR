@@ -8,8 +8,10 @@ function DrawCtrl($scope) {
 	var $this = this;
 	
 	$scope.scalePercent = 25;
+	$scope.rotation = 0;
     $scope.hue = 0;
 
+	this.bindEvents($scope);
 	this.initSurface($scope);
 
     $scope.newCanvas = this.initSurface.bind(this, $scope);
@@ -116,6 +118,20 @@ function DrawCtrl($scope) {
     };
 }
 DrawCtrl.$inject = ['$scope'];
+
+DrawCtrl.prototype.bindEvents = function($scope) {
+	jQuery(window).on('keydown', function(evt) {
+		if (evt.keyCode === 124 && evt.altKey) { // right rotate
+			$scope.$apply(function() {
+				$scope.rotation += 30;
+			});
+		} else if (evt.keyCode === 125 && evt.altKey) { // left rotate
+			$scope.$apply(function() {
+				$scope.rotation -= 30;
+			});
+		}
+	});
+};
 
 DrawCtrl.prototype.initSurface = function($scope) {
     $scope.drawR = new DrawR(jQuery('#drawSurface').empty());
