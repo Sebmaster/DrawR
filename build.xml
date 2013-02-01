@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<project basedir="." default="compile">
+	<property name="PREFIX" value="." />
+	<property description="source folder" name="src" value="${PREFIX}/src" />
+	<property description="public resources" name="dist" value="${PREFIX}/public" />
+	<property description="target file" name="TARGET" value="${dist}/js/script.min.js" />
+	<property description="the path to google closure" name="compiler" location="${PREFIX}/build/compiler.jar" />
+
+	<taskdef name="compilejs" classname="com.google.javascript.jscomp.ant.CompileTask" classpath="${compiler}" />
+
+	<target name="clean">
+		<delete file="${TARGET}" />
+	</target>
+
+	<target name="compile">
+		<compilejs compilationLevel="whitespace" prettyPrint="true" warning="verbose" output="${TARGET}">
+			<externs dir="${PREFIX}/build/externs">
+				<file name="angular.js" />
+				<file name="jquery.js" />
+			</externs>
+
+			<sources dir="${src}">
+				<file name="canvas-toBlob.js" />
+				<file name="filesaver.js" />
+				<file name="init.js" />
+				<file name="drawr.js" />
+			</sources>
+		</compilejs>
+	</target>
+</project>

@@ -1,0 +1,137 @@
+@toolsWidth: 230px;
+@layerWidth: 260px;
+
+@headerToolsTotalHeight: 50px;
+
+body {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+#content {
+	height: -webkit-calc(~"100% - " @headerToolsTotalHeight);
+	height: calc(~"100% - " @headerToolsTotalHeight);
+}
+
+#drawTools {
+	float: left;
+
+	width: (@toolsWidth - 10px);
+	height: ~"-webkit-calc(100% - 10px)";
+	height: ~"calc(100% - 10px)";
+
+	padding: 5px;
+	
+	@media print {
+		display: none;
+	}
+
+	.activeColor {
+		width: 30px;
+		height: 30px;
+	}
+}
+
+
+.colorpicker {
+	
+	margin: 20px 0 30px 0;
+	
+	.slider {
+    /*@gradient: left, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120,100%, 50%), hsl(180, 100%, 50%), hsl(240,100%,50%),hsl(300,100%,50%);*/
+    @gradient: left, #FF0000, #FFFF00, #00FF00, #00FFFF, #0000FF, #FF00FF;
+
+		width: 150px;
+		height: 15px;
+		margin: 0 auto;
+		background: -webkit-linear-gradient(@gradient);
+    background: -moz-linear-gradient(@gradient); 
+    background: -ms-linear-gradient(@gradient); 
+		background: linear-gradient(@gradient); 
+
+		& + input {
+			display: block;
+			width: 160px;
+			margin: 0 auto;
+		}
+	}
+
+	.chooser {
+		position: relative;
+		width: 100px;
+		height: 100px;
+
+		margin: 0 auto;
+
+		cursor: crosshair;
+				
+		background-color: ~"hsl(attr(data-hue number), 50%, 100%)";
+		background-image: url(../img/cp_overlay.png);
+	}
+}
+
+#surfaceContainer {
+    float: left;
+
+	width: -webkit-calc(~"100% - " (@layerWidth + @toolsWidth));
+	width: calc(~"100% - " (@layerWidth + @toolsWidth));
+	height: 100%;
+
+	margin: 0 auto;
+    overflow: auto;
+}
+
+#drawSurface {
+	position: relative;
+	margin: 0 auto;
+
+	-ms-touch-action: none;
+    
+	@size: 20px;
+	@gradient: 45deg, #EEE 25%, transparent 25%, transparent 75%, #EEE 75%, #EEE;
+
+	background-size: @size @size;
+	background-position: 0 0, (@size / 2) (@size / 2);
+	background-image: -webkit-linear-gradient(@gradient),
+	                  -webkit-linear-gradient(@gradient);
+	background-image: -moz-linear-gradient(@gradient),
+	                  -moz-linear-gradient(@gradient);
+	background-image: -ms-linear-gradient(@gradient),
+	                  -ms-linear-gradient(@gradient);
+	background-image: -o-linear-gradient(@gradient),
+	                  -o-linear-gradient(@gradient);
+	background-image: linear-gradient(@gradient),
+	                  linear-gradient(@gradient);
+	
+	canvas {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+
+		image-rendering: -o-crisp-edges;
+		image-rendering: -webkit-optimize-contrast;
+		image-rendering: -moz-optimize-contrast;
+		-ms-interpolation-mode: nearest-neighbor;
+	}
+}
+
+#drawLayers {
+	float: left;
+
+	width: @layerWidth;
+	height: 100%;
+
+	ul {
+		list-style: none;
+		padding-left: 0;
+
+		.name {
+			vertical-align: middle;
+		}
+	}
+	
+	@media print {
+		display: none;
+	}
+}

@@ -1,0 +1,627 @@
+/**
+ * @constructor
+ * @param {HTMLCanvasElement|string|jQuery} surface
+ * @param {HTMLCanvasElement|string|jQuery=} globalSurface
+ * @param {{width: number, height: number}=} options
+ */
+function DrawR(surface, globalSurface, options) {
+    if (!globalSurface) globalSurface = 'body';
+
+    this.options = jQuery.extend(true, {
+        width: 2480,
+        height: 3508
+    }, options);
+
+    this.globalSurface = jQuery(globalSurface);
+    this.surface = jQuery(surface);
+    this.layers = [];
+	
+    this.toggleActive(this.addLayer(0));
+	
+    this.touches = 0;
+    this.modifyOperations = {};
+
+    this.drawMode = 'Brush';
+    this.foregroundColor = '#000000';
+
+    this.drawStyle = {
+        Outliner: {
+            minLineWidth: 0.5,
+            lineWidth: 2
+        },
+        Brush: {
+            minLineWidth: 0.1,
+            lineWidth: 5
+        },
+        Bucket: {
+
+        },
+        Line: {
+            lineWidth: 5
+        },
+        Ereaser: {
+            lineWidth: 4
+        }
+    };
+
+    this.bindEvents();
+}
+
+DrawR.hsvToRgb = function(h, s, v) {
+	h = h / 60;
+    var i = Math.floor(h);
+    var f = h - i;
+    var p = v * (1 - s);
+    var q = v * (1 - s * f);
+    var t = v * (1 - s * (1 - f));
+    var rgb;
+    
+    switch (i) {
+    	case 0:
+            rgb = {r: v, g: t, b: p};
+    		break;
+		case 1:
+            rgb = {r: q, g: v, b: p};
+    		break;
+		case 2:
+            rgb = {r: p, g: v, b: t};
+    		break;
+		case 3:
+            rgb = {r: p, g: q, b: v};
+    		break;
+		case 4:
+            rgb = {r: t, g: p, b: v};
+    		break;
+		case 5:
+            rgb = {r: v, g: p, b: q};
+    		break;
+    }
+    
+	return rgb;
+};
+
+DrawR.rgbToHsv = function(r, g, b) {
+    var hsv = {h: 0, s: 0, v: 0};
+    if (r === 0 || g === 0 || b === 0) return hsv;
+    
+    r /= 255; g /= 255; b /= 255;
+    
+    var max = Math.max(r, g, b);
+    var min = Math.min(r, g, b);
+    var delta = max - min;
+    
+    if (delta === 0) return hsv;
+    
+    hsv.s = detla / max;
+    
+    if (max === r) {
+        hsv.h = (g - b) / delta;
+    } else if (max === g) {
+        hsv.h = 2 + (b - r) / delta;
+    } else {
+        hsv.h = 4 + (r - g) / delta;
+    }
+    hsv.h *= 60;
+    if (hsv.h < 0) hsv.h += 360;
+    
+    return hsv;
+};
+
+DrawR.prototype.addLayer = function(idx) {
+	var startCanvas = jQuery('<canvas>').prop({ width: this.options.width, height: this.options.height });
+	
+	if (idx === 0) {
+    	startCanvas.prependTo(this.surface);
+	} else {
+    	startCanvas.insertAfter(this.layers[idx - 1].ctx.canvas);
+	}
+
+    var ctx = startCanvas[0].getContext('2d');
+    ctx.translate(0.5, 0.5);
+    ctx.imageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
+    
+    var layer = { ctx: ctx, visible: true, blendMode: 'normal', opacity: 100, canvasData: ctx.getImageData(0, 0, this.options.width, this.options.height) };
+    this.layers.splice(idx, 0, layer);
+    
+    this.setLayerCSS(layer);
+    
+    return layer;
+};
+
+DrawR.prototype.toggleActive = function(layer) {
+    if (this.activeLayer === layer) {
+        this.activeLayer = null;
+    } else {
+        this.activeLayer = layer;
+    }
+};
+
+DrawR.prototype.moveLayer = function(from, to) {
+	if (to > from) {
+    	jQuery(this.layers[to].ctx.canvas).after(this.layers[from].ctx.canvas);
+	} else {
+    	jQuery(this.layers[to].ctx.canvas).before(this.layers[from].ctx.canvas);
+	}
+    
+    var layer = this.layers.splice(from, 1)[0];
+    this.layers.splice(to, 0, layer);
+};
+
+DrawR.prototype.setLayerCSS = function(layer) {
+	jQuery(layer.ctx.canvas).css({
+		MozBlendMode: layer.blendMode,
+		WebkitBlendMode: layer.blendMode,
+		blendMode: layer.blendMode
+	});
+};
+
+DrawR.prototype.removeLayer = function (idx) {
+    var layer = this.layers.splice(idx, 1)[0];
+    jQuery(layer.ctx.canvas).remove();
+};
+
+DrawR.prototype.showLayer = function (layer) {
+    layer.visible = true;
+    jQuery(layer.ctx.canvas).css('visibility', '');
+};
+
+DrawR.prototype.hideLayer = function (layer) {
+    layer.visible = false;
+    jQuery(layer.ctx.canvas).css('visibility', 'hidden');
+};
+
+/**
+ * Since the touch events only have positions relative to the document,
+ * this function is used to transform these coordinates into canvas coordinates.
+ * Additionally this function recalculates size differences between the
+ * rendering size and the surface size of the canvas.
+ * 
+ * @private 
+ * @param {number} x the x coordinate
+ * @return {number} the calculated canvas x-position
+ */
+DrawR.prototype.transformX = function (x) {
+    return Math.round((x - this.surface.offset().left) * this.options.width / this.surface[0].clientWidth);
+};
+
+/**
+ * @see {DrawR.prototype.transformX}
+ * 
+ * @private 
+ * @param {number} y the y coordinate
+ * @return {number} the calculated canvas y-position
+ */
+DrawR.prototype.transformY = function (y) {
+    return Math.round((y - this.surface.offset().top) * this.options.height / this.surface[0].clientHeight);
+};
+
+/**
+ * Binds the necessary events to draw to the canvas and the globalSurface.
+ * 
+ * This function accounts for browser differences (IE10 <=> all other browsers).
+ */
+DrawR.prototype.bindEvents = function () {
+    var $this = this;
+
+    if (navigator.msPointerEnabled) {
+        $this.surface.on('MSPointerDown', function (evt) {
+            evt.preventDefault();
+            evt = evt.originalEvent;
+            $this.touchStart({ x: evt.pageX, y: evt.pageY, identifier: evt.pointerId, force: evt.pressure });
+
+            $this.globalSurface.one('MSPointerUp MSPointerOut', function (evt) {
+                evt = evt.originalEvent;
+                $this.touchEnd({ identifier: evt.pointerId });
+            });
+        });
+        $this.globalSurface.on('MSPointerMove', function (evt) {
+            evt.preventDefault();
+            evt = evt.originalEvent;
+            if (!$this.modifyOperations[evt.pointerId]) return;
+
+            $this.touchMove({ identifier: evt.pointerId, x: evt.pageX, y: evt.pageY, intensity: evt.pressure });
+        });
+    } else {
+        $this.surface.on('touchstart', function (evt) {
+            evt.preventDefault();
+            evt = evt.originalEvent;
+
+            for (var i = 0; i < evt.changedTouches.length; ++i) {
+                var touch = evt.changedTouches[i];
+                $this.touchStart({ x: touch.pageX, y: touch.pageY, identifier: touch.identifier, force: touch.webkitForce || touch.force });
+            }
+
+            $this.surface.one('touchend touchleave touchcancel', function (evt) {
+                for (var i = 0; i < evt.originalEvent.changedTouches.length; ++i) {
+                    $this.touchEnd(evt.originalEvent.changedTouches[i]);
+                }
+            });
+        }).on('mousedown', function (evt) {
+            if (evt.which !== 1) return;
+
+            evt.preventDefault();
+            $this.touchStart({ x: evt.pageX, y: evt.pageY, identifier: -1, force: 0 });
+
+            $this.globalSurface.one('mouseup mouseleave', function (evt) {
+                $this.touchEnd({ identifier: -1 });
+            });
+        });
+
+        $this.globalSurface.on('touchmove', function (evt) {
+            evt.preventDefault();
+            evt = evt.originalEvent;
+
+            for (var i = 0; i < evt.changedTouches.length; ++i) {
+                var touch = evt.changedTouches[i];
+                if (!$this.modifyOperations[touch.identifier]) continue;
+
+                $this.touchMove({ x: touch.pageX, y: touch.pageY, identifier: touch.identifier, force: touch.webkitForce || touch.force });
+            }
+        }).on('mousemove', function (evt) {
+            if (!$this.modifyOperations[-1]) return;
+
+            evt.preventDefault();
+
+            $this.touchMove({ x: evt.pageX, y: evt.pageY, identifier: -1, force: 0 });
+        })
+    }
+};
+
+DrawR.prototype.download = function (fn) {
+    this.activeLayer.ctx.canvas.toBlob(fn);
+};
+
+DrawR.prototype.draw = function () {
+    if (Object.keys(this.modifyOperations).length === 0) return;
+
+    var minX = Number.POSITIVE_INFINITY;
+    var minY = Number.POSITIVE_INFINITY;
+    var maxX = Number.NEGATIVE_INFINITY;
+    var maxY = Number.NEGATIVE_INFINITY;
+
+    for (var i in this.modifyOperations) {
+        var dirty = this['determineDirty' + this.drawMode](this.modifyOperations[i], 0);
+        minX = Math.min(dirty.minX, minX);
+        minY = Math.min(dirty.minY, minY);
+        maxX = Math.max(dirty.maxX, maxX);
+        maxY = Math.max(dirty.maxY, maxY);
+    }
+
+    this.activeLayer.ctx.putImageData(this.activeLayer.canvasData, 0, 0, minX, minY, maxX - minX, maxY - minY);
+
+    for (var i in this.modifyOperations) {
+        this['draw' + this.drawMode](this.modifyOperations[i], 0);
+    }
+	this.mergeCanvas(minX, minY, maxX, maxY);
+};
+
+DrawR.prototype.mergeCanvas = function(x, y, w, h) {
+	/*x = x || 0;
+	y = y || 0;
+	w = w || this.options.width;
+	h = h || this.options.height;
+	
+	for (var i=0; i < this.layers.length; ++i) {
+		var imageData = this.layers[i].ctx.getImageData(0, 0, this.options.width, this.options.height);
+		this.layers[i].tex.loadContentsOf(imageData);
+		this.compositeCanvas.draw(this.layers[i].tex);
+	}
+	this.compositeCanvas.update();*/
+};
+
+DrawR.prototype.touchStart = function (touch) {
+    if (touch.force === 0) touch.force = 1;
+    touch.x = this.transformX(touch.x);
+    touch.y = this.transformY(touch.y);
+    
+    if (touch.x > this.options.width || touch.y > this.options.height) return;
+
+    if (!this.modifyOperations[touch.identifier]) this.modifyOperations[touch.identifier] = [];
+    this.modifyOperations[touch.identifier].push(touch);
+
+    this['draw' + this.drawMode](this.modifyOperations[touch.identifier], 0);
+
+    ++this.touches;
+};
+
+DrawR.prototype.touchMove = function (touch) {
+    if (touch.force === 0) touch.force = 1;
+    touch.x = this.transformX(touch.x);
+    touch.y = this.transformY(touch.y);
+
+    this.modifyOperations[touch.identifier].push(touch);
+
+    if (this['redrawDirty' + this.drawMode]) {
+        requestAnimationFrame(this.draw.bind(this));
+    } else {
+    	var $this = this;
+    	var len = $this.modifyOperations[touch.identifier].length;
+    	
+    		if (!$this.modifyOperations[touch.identifier]) return;
+    		
+       		$this['draw' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
+       		
+       		var dirty = $this['determineDirty' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
+       		$this.mergeCanvas(dirty.minX, dirty.minY, dirty.maxX - dirty.minX, dirty.maxY - dirty.minY);
+    	
+    }
+};
+
+DrawR.prototype.touchEnd = function (touch) {
+    if (!this.modifyOperations[touch.identifier]) return;
+
+    --this.touches;
+    if (this.touches === 0) {
+    	if (this['redrawDirty' + this.drawMode]) {
+    		this.draw();
+    	}
+    	
+        this.activeLayer.canvasData = this.activeLayer.ctx.getImageData(0, 0, this.options.width, this.options.height);
+        this.modifyOperations = {};
+    }
+};
+
+DrawR.prototype.drawOutliner = function (touchPoints, start) {
+    this.activeLayer.ctx.beginPath();
+
+    var lastX = touchPoints[start].x;
+    var lastY = touchPoints[start].y;
+
+    this.activeLayer.ctx.moveTo(lastX, lastY);
+    for (var j = start + 1; j < touchPoints.length; ++j) {
+        this.activeLayer.ctx.lineTo(touchPoints[j].x, touchPoints[j].y);
+    }
+
+    this.activeLayer.ctx.strokeStyle = this.foregroundColor;
+    this.activeLayer.ctx.lineWidth = this.drawStyle.Outliner.minLineWidth * this.drawStyle.Outliner.lineWidth + (this.drawStyle.Outliner.lineWidth - this.drawStyle.Outliner.minLineWidth * this.drawStyle.Outliner.lineWidth) * touchPoints[start].force;
+    this.activeLayer.ctx.lineJoin = this.activeLayer.ctx.lineCap = 'round';
+    this.activeLayer.ctx.stroke();
+};
+DrawR.prototype.redrawDirtyOutliner = false;
+
+DrawR.prototype.determineDirtyOutliner = function (touchPoints, start) {
+	var minX = touchPoints[start].x;
+	var minY = touchPoints[start].y;
+	var maxX = minX;
+	var maxY = minY;
+	
+    for (var j = start + 1; j < touchPoints.length; ++j) {
+        minX = Math.min(touchPoints[j].x, minX);
+        minY = Math.min(touchPoints[j].y, minY);
+        maxX = Math.max(touchPoints[j].x, maxX);
+        maxY = Math.max(touchPoints[j].y, maxY);
+    }
+    
+    return {minX: minX - this.drawStyle.Outliner.lineWidth / 2,
+    	    minY: minY - this.drawStyle.Outliner.lineWidth / 2,
+    	    maxX: maxX + this.drawStyle.Outliner.lineWidth / 2,
+    	    maxY: maxY + this.drawStyle.Outliner.lineWidth / 2};
+};
+
+DrawR.prototype.drawBrush = function (touchPoints, start) {
+    this.activeLayer.ctx.beginPath();
+
+    var lastX = touchPoints[start].x;
+    var lastY = touchPoints[start].y;
+
+    this.activeLayer.ctx.moveTo(lastX, lastY);
+    for (var j = start; j < touchPoints.length; ++j) {
+        this.activeLayer.ctx.lineTo(touchPoints[j].x, touchPoints[j].y);
+    }
+
+    this.activeLayer.ctx.strokeStyle = this.foregroundColor;
+    this.activeLayer.ctx.lineWidth = this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth + (this.drawStyle.Brush.lineWidth - this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth) * touchPoints[start].force;
+    this.activeLayer.ctx.lineJoin = this.activeLayer.ctx.lineCap = 'round';
+    this.activeLayer.ctx.stroke();
+};
+
+DrawR.prototype.redrawDirtyBrush = false;
+
+DrawR.prototype.determineDirtyBrush = function (touchPoints, start) {
+	var lineWidth = this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth + (this.drawStyle.Brush.lineWidth - this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth) * touchPoints[0].force;
+	var minX = touchPoints[start].x;
+	var minY = touchPoints[start].y;
+	var maxX = minX;
+	var maxY = minY;
+	
+    for (var j = start + 1; j < touchPoints.length; ++j) {
+        minX = Math.min(touchPoints[j].x, minX);
+        minY = Math.min(touchPoints[j].y, minY);
+        maxX = Math.max(touchPoints[j].x, maxX);
+        maxY = Math.max(touchPoints[j].y, maxY);
+    }
+    
+    return {minX: minX - lineWidth / 2,
+    	    minY: minY - lineWidth / 2,
+    	    maxX: maxX + lineWidth / 2,
+    	    maxY: maxY + lineWidth / 2};
+};
+
+DrawR.prototype.drawEreaser = function (touchPoints, start) {
+    this.activeLayer.ctx.beginPath();
+
+    var lastX = touchPoints[start].x;
+    var lastY = touchPoints[start].y;
+
+    this.activeLayer.ctx.moveTo(lastX, lastY);
+    for (var j = start; j < touchPoints.length; ++j) {
+        this.activeLayer.ctx.lineTo(touchPoints[j].x, touchPoints[j].y);
+    }
+
+    var op = this.activeLayer.ctx.globalCompositeOperation;
+    this.activeLayer.ctx.globalCompositeOperation = 'copy';
+    this.activeLayer.ctx.lineWidth = this.drawStyle.Ereaser.lineWidth;
+    this.activeLayer.ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+    this.activeLayer.ctx.lineJoin = this.activeLayer.ctx.lineCap = 'round';
+    this.activeLayer.ctx.stroke();
+    this.activeLayer.ctx.globalCompositeOperation = op;
+};
+DrawR.prototype.redrawDirtyEreaser = false;
+
+DrawR.prototype.determineDirtyEreaser = function (touchPoints, start) {
+    var lineWidth = this.drawStyle.Ereaser.lineWidth;
+	var minX = touchPoints[start].x;
+	var minY = touchPoints[start].y;
+	var maxX = minX;
+	var maxY = minY;
+	
+    for (var j = start + 1; j < touchPoints.length; ++j) {
+        minX = Math.min(touchPoints[j].x, minX);
+        minY = Math.min(touchPoints[j].y, minY);
+        maxX = Math.max(touchPoints[j].x, maxX);
+        maxY = Math.max(touchPoints[j].y, maxY);
+    }
+    
+    return {minX: minX - lineWidth / 2,
+    	    minY: minY - lineWidth / 2,
+    	    maxX: maxX + lineWidth / 2,
+    	    maxY: maxY + lineWidth / 2};
+};
+
+DrawR.prototype.drawLine = function (touchPoints, start) {
+    this.activeLayer.ctx.beginPath();
+    this.activeLayer.ctx.moveTo(touchPoints[0].x, touchPoints[0].y);
+    this.activeLayer.ctx.lineTo(touchPoints[touchPoints.length - 1].x, touchPoints[touchPoints.length - 1].y);
+    this.activeLayer.ctx.lineWidth = this.drawStyle.Line.lineWidth;
+    this.activeLayer.ctx.lineCap = 'round';
+    this.activeLayer.ctx.strokeStyle = this.foregroundColor;
+    this.activeLayer.ctx.stroke();
+    
+    return {minX: touchPoints[0].x,
+    	    minY: touchPoints[0].y,
+    	    maxX: touchPoints[touchPoints.length - 1].x,
+    	    maxY: touchPoints[touchPoints.length - 1].y};
+};
+DrawR.prototype.redrawDirtyLine = true;
+
+DrawR.prototype.determineDirtyLine = function (touchPoints, start) {
+    var minX = touchPoints[0].x;
+    var minY = touchPoints[0].y;
+
+    var maxX = minX;
+    var maxY = minY;
+
+    for (var i = 1; i < touchPoints.length; ++i) {
+        minX = Math.min(touchPoints[i].x, minX);
+        minY = Math.min(touchPoints[i].y, minY);
+        maxX = Math.max(touchPoints[i].x, maxX);
+        maxY = Math.max(touchPoints[i].y, maxY);
+    }
+
+    return {
+        minX: minX - Math.ceil(this.drawStyle.Line.lineWidth / 2),
+        minY: minY - Math.ceil(this.drawStyle.Line.lineWidth / 2),
+        maxX: maxX + Math.ceil(this.drawStyle.Line.lineWidth / 2),
+        maxY: maxY + Math.ceil(this.drawStyle.Line.lineWidth / 2)
+    };
+};
+
+DrawR.prototype.drawBucket = function (touchPoints, start) {
+    var width = this.options.width;
+    var height = this.options.height;
+
+    var col = [0, 0, 0];
+    var drawStyle = this.foregroundColor;
+    col[0] = parseInt(drawStyle.substr(1, 2), 16);
+    col[1] = parseInt(drawStyle.substr(3, 2), 16);
+    col[2] = parseInt(drawStyle.substr(5, 2), 16);
+
+    var data = this.activeLayer.canvasData.data;
+    var target = new Int32Array(data.buffer);
+    var oldVal = target[0];
+    var finalCol;
+    
+    target[0] = 0x0a;
+    if (data[0] === 0x0a) {
+		finalCol = (
+			(255 << 24) |
+			(col[2] << 16) |
+			(col[1] << 8) |
+			 col[0]
+		);
+	} else {
+		finalCol = (
+			(255 << 24) |
+			(col[2] << 16) |
+			(col[1] << 8) |
+			 col[0]
+		);
+	}
+	
+	target[0] = oldVal;
+
+    var touchPoint = touchPoints[touchPoints.length - 1];
+
+    var stack = [[touchPoint.x, touchPoint.y]];
+    var oldColor = target[touchPoint.x + touchPoint.y * width];
+
+    if (finalCol === oldColor) return;
+
+    var minX = touchPoint.x;
+    var minY = touchPoint.y;
+    var maxX = minX;
+    var maxY = minY;
+    var now;
+
+    while (now = stack.shift()) {
+        var arrPos = now[0] + now[1] * width;
+
+        var myColor = target[arrPos];
+
+        if (myColor !== oldColor) continue;
+
+        minX = Math.min(now[0], minX);
+        minY = Math.min(now[1], minY);
+        maxX = Math.max(now[0], maxX);
+        maxY = Math.max(now[1], maxY);
+
+        target[arrPos] = finalCol;
+
+        if (now[0] > 0) {
+            stack.push([now[0] - 1, now[1]]);
+        }
+        if (now[0] < this.options.width - 1) {
+            stack.push([now[0] + 1, now[1]]);
+        }
+        if (now[1] > 0) {
+            stack.push([now[0], now[1] - 1]);
+        }
+        if (now[1] < this.options.height - 1) {
+            stack.push([now[0], now[1] + 1]);
+        }
+    }
+
+    this.activeLayer.ctx.putImageData(this.activeLayer.canvasData, 0, 0, minX, minY, maxX - minX + 1, maxY - minY + 1);
+    
+    return {minX: minX,
+    	    minY: minY,
+    	    maxX: maxX,
+    	    maxY: maxY};
+};
+DrawR.prototype.redrawDirtyBucket = false;
+
+DrawR.prototype.determineDirtyBucket = function (touchPoints, start) {
+    return null;
+};
+
+DrawR.prototype.hsvFilter = function(h, s, v) {
+    var imageData = this.activeLayer.canvasData.data;
+    
+    for (var i=0; i < this.options.width; ++i) {
+        for (var j=0; j < this.options.height; ++j) {
+            var pos = i * this.options.height + j;
+            var hsv = DrawR.rgbToHsv(imageData[pos], imageData[pos + 1], imageData[pos + 2]);
+            hsv.h += h;
+            hsv.s += s;
+            hsv.v += v;
+            var rgb = DrawR.hsvToRgb(hsv.h, hsv.s, hsv.v);
+            imageData[pos] = rgb.r;
+            imageData[pos + 1] = rgb.g;
+            imageData[pos + 2] = rgb.b;
+        }
+    }
+    
+    this.activeLayer.ctx.putImageData(this.activeLayer.canvasData, 0, 0);
+};
