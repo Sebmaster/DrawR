@@ -18,11 +18,7 @@ function DrawR(surface, globalSurface, options) {
 	
     this.toggleActive(this.addLayer(0));
 	
-    this.touches = 0;
     this.modifyOperations = {};
-
-    this.drawMode = 'Brush';
-    this.foregroundColor = '#000000';
 
     this.drawStyle = {
         Outliner: {
@@ -46,6 +42,15 @@ function DrawR(surface, globalSurface, options) {
 
     this.bindEvents();
 }
+
+/**
+ * @enum {string}
+ */
+DrawR.BrushModes = {
+	OUTLINER: 'Outliner',
+	BRUSH: 'Brush',
+	BUCKET: 'Bucket'
+};
 
 DrawR.hsvToRgb = function(h, s, v) {
 	h = h / 60;
@@ -106,6 +111,13 @@ DrawR.rgbToHsv = function(r, g, b) {
     
     return hsv;
 };
+
+/** @type {string} */
+DrawR.prototype.foregroundColor = '#000000';
+/** @type {DrawR.BrushModes} */
+DrawR.prototype.drawMode = DrawR.BrushModes.BRUSH;
+/** @type {number} */
+DrawR.prototype.touches = 0;
 
 DrawR.prototype.addLayer = function(idx) {
 	var startCanvas = jQuery('<canvas>').prop({ width: this.options.width, height: this.options.height });
