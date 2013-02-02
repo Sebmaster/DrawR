@@ -119,7 +119,17 @@ function DrawCtrl($scope) {
 }
 DrawCtrl.$inject = ['$scope'];
 
+DrawCtrl.prototype.getZoom = function() {
+	var zoom = window.innerWidth / document.width;
+	if (isNaN(zoom)) {
+		return null;
+	}
+	return zoom;
+};
+
 DrawCtrl.prototype.bindEvents = function($scope) {
+	var $this = this;
+	
 	jQuery(window).on('keydown', function(evt) {
 		if (evt.keyCode === 124 && evt.altKey) { // right rotate
 			$scope.$apply(function() {
@@ -131,6 +141,27 @@ DrawCtrl.prototype.bindEvents = function($scope) {
 			});
 		}
 	});
+	
+	if (this.getZoom() !== null) {
+		var oldTransformX = DrawR.prototype.transformX;
+		var oldTransformY = DrawR.prototype.transformY;
+		
+		DrawR.prototype.transformX = function(x) {
+			return oldTransformX.call(this, x / $this.getZoom());
+		};
+		
+		DrawR.prototype.transformY = function(y) {
+			return oldTransformY.call(this, y / $this.getZoom());
+		};
+		
+		jQuery(window).on('resize', function(e) {
+			var zoom = $this.getZoom();
+			jQuery('body').css('zoom', zoom);
+			
+			$scope.scalePercent = Math.round(100 / $this.getZoom());
+			$scope.$apply();
+		});
+	}
 };
 
 DrawCtrl.prototype.initSurface = function($scope) {
