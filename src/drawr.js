@@ -311,7 +311,12 @@ DrawR.prototype.bindEvents = function () {
 };
 
 DrawR.prototype.download = function (fn) {
-    this.activeLayer.ctx.canvas.toBlob(fn);
+	var result = jQuery('<canvas>').prop({width: this.options.width, height: this.options.height})[0];
+	var ctx = result.getContext('2d');
+	for (var i=0; i < this.layers.length; ++i) {
+		ctx.drawImage(this.layers[i].ctx.canvas, 0, 0);
+	}
+    result.toBlob(fn);
 };
 
 DrawR.prototype.draw = function () {
