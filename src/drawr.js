@@ -638,7 +638,7 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
 		
 		for (var i=minY; i <= maxY + 1; ++i) {
 			for (var j=minX; j <= maxX + 1; ++j) {
-				var pos = j + i * width * 4;
+				var pos = (j + i * width) * 4;
 				backData[pos] = data[pos];
 				backData[pos + 1] = data[pos + 1];
 				backData[pos + 2] = data[pos + 2];
