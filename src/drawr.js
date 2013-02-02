@@ -190,6 +190,7 @@ DrawR.prototype.moveLayer = function(from, to) {
 
 DrawR.prototype.setLayerCSS = function(layer) {
 	jQuery(layer.ctx.canvas).css({
+		opacity: layer.opacity / 100,
 		MozBlendMode: layer.blendMode,
 		WebkitBlendMode: layer.blendMode,
 		blendMode: layer.blendMode

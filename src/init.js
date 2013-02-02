@@ -66,6 +66,10 @@ function DrawCtrl($scope) {
     	$scope.drawR.setLayerCSS($scope.drawR.activeLayer);
     });
 
+    $scope.$watch('drawR.activeLayer.opacity', function() {
+    	$scope.drawR.setLayerCSS($scope.drawR.activeLayer);
+    });
+
     $scope.toggleVisibility = function (layer) {
         if (layer.visible) {
             $scope.drawR.hideLayer(layer);
