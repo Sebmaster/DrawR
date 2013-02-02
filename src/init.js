@@ -151,21 +151,21 @@ DrawCtrl.prototype.changeColor = function($scope) {
 	var rgb = DrawR.hsvToRgb($scope.hue, s, v);
 	
 	var r = Math.round(rgb.r * 255);
-    if (r <= 16) {
+    if (r < 16) {
     	r = '0' + r.toString(16);
     } else {
     	r = r.toString(16);
     }
     
     var g = Math.round(rgb.g * 255);
-    if (g <= 16) {
+    if (g < 16) {
     	g = '0' + g.toString(16);
     } else {
     	g = g.toString(16);
     }
     
     var b = Math.round(rgb.b * 255);
-    if (b <= 16) {
+    if (b < 16) {
     	b = '0' + b.toString(16);
     } else {
     	b = b.toString(16);
