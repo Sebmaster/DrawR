@@ -155,7 +155,7 @@ DrawR.prototype.addLayer = function(idx) {
     ctx.mozImageSmoothingEnabled = false;
     ctx.webkitImageSmoothingEnabled = false;
     
-    var layer = { ctx: ctx, visible: true, blendMode: 'normal', opacity: 100, canvasData: ctx.getImageData(0, 0, this.options.width, this.options.height) };
+    var layer = { ctx: ctx, visible: true, blendMode: 'normal', opacity: 100, canvasData: ctx.createImageData(this.options.width, this.options.height) };
     this.layers.splice(idx, 0, layer);
     
     this.setLayerCSS(layer);
