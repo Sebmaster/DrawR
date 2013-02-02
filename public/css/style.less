@@ -15,7 +15,7 @@ body {
 }
 
 #drawTools {
-	float: left;
+	position: fixed;
 
 	width: (@toolsWidth - 10px);
 	height: ~"-webkit-calc(100% - 10px)";
@@ -72,7 +72,8 @@ body {
 }
 
 #surfaceContainer {
-    float: left;
+  position: fixed;
+  left: @toolsWidth;
 
 	width: -webkit-calc(~"100% - " (@layerWidth + @toolsWidth));
 	width: calc(~"100% - " (@layerWidth + @toolsWidth));
@@ -117,7 +118,8 @@ body {
 }
 
 #drawLayers {
-	float: left;
+  position: fixed;
+  right: 0;
 
 	width: @layerWidth;
 	height: 100%;
