@@ -120,15 +120,25 @@ function DrawCtrl($scope) {
 DrawCtrl.$inject = ['$scope'];
 
 DrawCtrl.prototype.bindEvents = function($scope) {
+	var preMode = null;
+	
 	jQuery(window).on('keydown', function(evt) {
 		if (evt.keyCode === 124 && evt.altKey) { // right rotate
-			$scope.$apply(function() {
-				$scope.rotation += 30;
-			});
+			$scope.rotation += 30;
+			$scope.$apply();
 		} else if (evt.keyCode === 125 && evt.altKey) { // left rotate
-			$scope.$apply(function() {
-				$scope.rotation -= 30;
-			});
+			$scope.rotation -= 30;
+			$scope.$apply();
+		} else if (evt.keyCode === 16 && $scope.drawR.drawMode !== 'Ereaser') { // shift key (temp eraser)
+			preMode = $scope.drawR.drawMode;
+			$scope.drawR.drawMode = 'Ereaser';
+			$scope.$apply();
+		}
+	}).on('keyup', function(evt) {
+		if (evt.keyCode === 16) { // shift key (temp eraser)
+			$scope.drawR.drawMode = preMode;
+			preMode = null;
+			$scope.$apply();
 		}
 	});
 };
