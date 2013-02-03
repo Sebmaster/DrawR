@@ -315,6 +315,8 @@ DrawR.prototype.download = function (fn) {
 	var result = jQuery('<canvas>').prop({width: this.options.width, height: this.options.height})[0];
 	var ctx = result.getContext('2d');
 	for (var i=0; i < this.layers.length; ++i) {
+		if (!this.layers[i].visible) continue;
+
 		if (this.layers[i].blendMode === 'normal') {
 			ctx.globalCompositeOperation = 'source-over';
 		} else {
