@@ -7,13 +7,14 @@
 function DrawR(surface, globalSurface, options) {
     if (!globalSurface) globalSurface = 'body';
 
-    this.options = jQuery.extend(true, {
+    this.options = /** @type {{width: number, height: number}} */(jQuery.extend(true, {
         width: 2480,
         height: 3508
-    }, options);
+    }, options));
 
     this.globalSurface = jQuery(globalSurface);
     this.surface = jQuery(surface);
+    /** @type {Array.<DrawR.Layer>} */
     this.layers = [];
 	
     this.toggleActive(this.addLayer(0));
