@@ -250,7 +250,7 @@ DrawR.prototype.bindEvents = function () {
         $this.surface.on('MSPointerDown', function (evt) {
             evt.preventDefault();
             evt = evt.originalEvent;
-            $this.touchStart({ x: evt.offsetX, y: evt.offsetY, identifier: evt.pointerId, force: evt.pressure });
+            $this.touchStart({ x: evt.offsetX, y: evt.offsetY, identifier: evt.pointerId, force: evt['pressure'] });
 
             $this.globalSurface.one('MSPointerUp MSPointerOut', function (evt) {
                 evt = evt.originalEvent;
@@ -262,7 +262,7 @@ DrawR.prototype.bindEvents = function () {
             evt = evt.originalEvent;
             if (!$this.modifyOperations[evt.pointerId]) return;
 
-            $this.touchMove({ identifier: evt.pointerId, x: evt.offsetX, y: evt.offsetY, force: evt.pressure });
+            $this.touchMove({ identifier: evt.pointerId, x: evt.offsetX, y: evt.offsetY, force: evt['pressure'] });
         });
     } else {
         $this.surface.on('touchstart', function (evt) {
@@ -272,7 +272,7 @@ DrawR.prototype.bindEvents = function () {
 
             for (var i = 0; i < evt.changedTouches.length; ++i) {
                 var touch = evt.changedTouches[i];
-                $this.touchStart({ x: touch.pageX - offset.left, y: touch.pageY - offset.top, identifier: touch.identifier, force: touch.webkitForce || touch.force });
+                $this.touchStart({ x: touch.pageX - offset.left, y: touch.pageY - offset.top, identifier: touch.identifier, force: touch['webkitForce'] || touch.force });
             }
 
             $this.surface.one('touchend touchleave touchcancel', function (evt) {
@@ -300,7 +300,7 @@ DrawR.prototype.bindEvents = function () {
                 var touch = evt.changedTouches[i];
                 if (!$this.modifyOperations[touch.identifier]) continue;
 
-                $this.touchMove({ x: touch.pageX - offset.left, y: touch.pageY - offset.top, identifier: touch.identifier, force: touch.webkitForce || touch.force });
+                $this.touchMove({ x: touch.pageX - offset.left, y: touch.pageY - offset.top, identifier: touch.identifier, force: touch['webkitForce'] || touch.force });
             }
         }).on('mousemove', function (evt) {
             if (!$this.modifyOperations[-1]) return;
