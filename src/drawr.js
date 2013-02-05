@@ -403,8 +403,6 @@ DrawR.prototype.touchMove = function (touch) {
     } else {
     	var $this = this;
     	var len = $this.modifyOperations[touch.identifier].length;
-    	
-    		if (!$this.modifyOperations[touch.identifier]) return;
     		
        		$this['draw' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
        		
