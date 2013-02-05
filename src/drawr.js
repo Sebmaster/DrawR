@@ -415,8 +415,9 @@ DrawR.prototype.touchEnd = function (touch) {
     	}
     	
         this.modifyOperations = {};
-    	(setImmediate || setTimeout)(function() {
-        	this.activeLayer.canvasData = this.activeLayer.ctx.getImageData(0, 0, this.options.width, this.options.height);
+        var $this = this;
+    	(self.setImmediate || self.setTimeout)(function() {
+        	$this.activeLayer.canvasData = $this.activeLayer.ctx.getImageData(0, 0, $this.options.width, $this.options.height);
     	}, 0);
     }
 };
