@@ -8,7 +8,6 @@ function DrawCtrl($scope) {
 	var $this = this;
 	
 	$scope.scalePercent = 25;
-	$scope.rotation = 0;
     $scope.hue = 0;
 
 	this.bindEvents($scope);
@@ -128,10 +127,10 @@ DrawCtrl.prototype.bindEvents = function($scope) {
 	
 	jQuery(window).on('keydown', function(evt) {
 		if (evt.keyCode === 124 && evt.altKey) { // right rotate
-			$scope.rotation += 30;
+			$scope.drawR.rotation += 30;
 			$scope.$apply();
 		} else if (evt.keyCode === 125 && evt.altKey) { // left rotate
-			$scope.rotation -= 30;
+			$scope.drawR.rotation -= 30;
 			$scope.$apply();
 		} else if (evt.keyCode === 16 && $scope.drawR.drawMode !== 'Ereaser') { // shift key (temp eraser)
 			preMode = $scope.drawR.drawMode;

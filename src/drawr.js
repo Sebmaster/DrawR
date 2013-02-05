@@ -40,6 +40,15 @@ function DrawR(surface, globalSurface, options) {
             lineWidth: 4
         }
     };
+    
+    var rotation = 0;
+    this.__defineSetter__('rotation', function(rot) {
+    	rotation = rot;
+    	this.surface.css('transform', 'rotate3d(0, 0, 1, ' + rotation + 'deg)');
+    });
+    this.__defineGetter__('rotation', function() {
+    	return rotation;
+    });
 
     this.bindEvents();
 }
