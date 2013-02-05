@@ -403,12 +403,11 @@ DrawR.prototype.touchMove = function (touch) {
     } else {
     	var $this = this;
     	var len = $this.modifyOperations[touch.identifier].length;
-    		
-       		$this['draw' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
-       		
-       		var dirty = $this['determineDirty' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
-       		$this.mergeCanvas(dirty.minX, dirty.minY, dirty.maxX - dirty.minX, dirty.maxY - dirty.minY);
     	
+   		$this['draw' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
+   		
+   		var dirty = $this['determineDirty' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
+   		$this.mergeCanvas(dirty.minX, dirty.minY, dirty.maxX - dirty.minX, dirty.maxY - dirty.minY);
     }
 };
 
