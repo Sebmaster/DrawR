@@ -404,7 +404,7 @@ DrawR.prototype.save = function(fn) {
 		blobArr.push(json);
 		blobArr.push.apply(blobArr, canvasData);
 		
-		fn(new Blob(blobArr, {type: 'application/octet-binary'}));
+		fn(new Blob(blobArr, {type: 'application/x.drawr'}));
 	}
 };
 

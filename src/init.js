@@ -28,7 +28,7 @@ function DrawCtrl($scope) {
     };
 
     $scope.load = function () {
-        jQuery('<input>').prop('type', 'file').change(function () {
+        jQuery('<input>').prop({type: 'file', accept: '.drawR,application/x.drawr,image/*'}).change(function () {
         	$scope.drawR.load(this.files[0], $scope.$apply);
         }).click();
     };
