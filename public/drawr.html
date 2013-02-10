@@ -14,8 +14,17 @@
 <body data-ng-controller="DrawCtrl">
     <div id="headerTools" class="btn-toolbar">
         <img class="btn" src="img/icons/page_white_add.png" data-ng-click="newCanvas()">
-        <img class="btn" src="img/icons/disk.png" data-ng-click="save()">
-        <img class="btn" src="img/icons/image.png" data-ng-click="importImage()">
+    	<div class="btn-group">
+        	<button class="btn"><img src="img/icons/disk.png" data-ng-click="save()"></button>
+        	<button class="btn dropdown-toggle" data-toggle="dropdown">
+        		<span class="caret"></span>
+        	</button>
+        	<ul class="dropdown-menu">
+        		<li><img class="btn" src="img/icons/disk.png" data-ng-click="save()"> Save as DrawR</li>
+        		<li><img class="btn" src="img/icons/disk.png" data-ng-click="download()"> Save as PNG</li>
+        	</ul>
+    	</div>
+        <img class="btn" src="img/icons/image.png" data-ng-click="load()">
         
         <span class="input-append">
        		<input class="input input-mini" type="number" ng-model="scalePercent">

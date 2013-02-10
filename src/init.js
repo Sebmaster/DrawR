@@ -15,15 +15,21 @@ function DrawCtrl($scope) {
 
     $scope.newCanvas = this.initSurface.bind(this, $scope);
 
-    $scope.save = function () {
+    $scope.download = function () {
         $scope.drawR.download(function (blob) {
             window.saveAs(blob, 'img.png');
         });
     };
 
-    $scope.importImage = function () {
+    $scope.save = function () {
+		$scope.drawR.save(function (blob) {
+            window.saveAs(blob, 'img.drawR');
+        });
+    };
+
+    $scope.load = function () {
         jQuery('<input>').prop('type', 'file').change(function () {
-            //console.log(this.files);
+        	$scope.drawR.load(this.files[0], $scope.$apply);
         }).click();
     };
 

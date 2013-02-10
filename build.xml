@@ -22,6 +22,7 @@
 			<sources dir="${src}">
 				<file name="canvas-toBlob.js" />
 				<file name="filesaver.js" />
+				<file name="bootstrap.min.js" />
 				<file name="init.js" />
 				<file name="drawr.js" />
 			</sources>
