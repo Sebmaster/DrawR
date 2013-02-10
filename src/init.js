@@ -134,9 +134,11 @@ DrawCtrl.prototype.bindEvents = function($scope) {
 	jQuery(window).on('keydown', function(evt) {
 		if (evt.keyCode === 124 && evt.altKey) { // right rotate
 			$scope.drawR.rotation += 30;
+			$scope.drawR.refreshLayout();
 			$scope.$apply();
 		} else if (evt.keyCode === 125 && evt.altKey) { // left rotate
 			$scope.drawR.rotation -= 30;
+			$scope.drawR.refreshLayout();
 			$scope.$apply();
 		} else if (evt.keyCode === 16 && $scope.drawR.drawMode !== 'Ereaser') { // shift key (temp eraser)
 			preMode = $scope.drawR.drawMode;

@@ -40,15 +40,6 @@ function DrawR(surface, globalSurface, options) {
             lineWidth: 4
         }
     };
-    
-    var rotation = 0;
-    this.__defineSetter__('rotation', function(rot) {
-    	rotation = rot;
-    	this.surface.css('transform', 'rotate3d(0, 0, 1, ' + rotation + 'deg)');
-    });
-    this.__defineGetter__('rotation', function() {
-    	return rotation;
-    });
 
     this.bindEvents();
 }
@@ -143,6 +134,11 @@ DrawR.prototype.drawMode = DrawR.BrushModes.BRUSH;
  * @type {number}
  */
 DrawR.prototype.touches = 0;
+/**
+ * @private
+ * @type {number}
+ */
+DrawR.prototype.rotation = 0;
 
 /**
  * Adds a new layer at the specified index.
@@ -196,6 +192,10 @@ DrawR.prototype.moveLayer = function(from, to) {
     
     var layer = this.layers.splice(from, 1)[0];
     this.layers.splice(to, 0, layer);
+};
+
+DrawR.prototype.refreshLayout = function() {
+	this.surface.css('transform', 'rotate3d(0, 0, 1, ' + this.rotation + 'deg)');
 };
 
 DrawR.prototype.setLayerCSS = function(layer) {
