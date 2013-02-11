@@ -164,7 +164,7 @@ DrawR.prototype.addLayer = function(idx) {
     var layer = { ctx: ctx, visible: true, blendMode: 'normal', opacity: 100, canvasData: ctx.createImageData(this.options.width, this.options.height) };
     this.layers.splice(idx, 0, layer);
     
-    this.setLayerCSS(layer);
+    this.refreshLayout();
     
     return layer;
 };
@@ -196,15 +196,15 @@ DrawR.prototype.moveLayer = function(from, to) {
 
 DrawR.prototype.refreshLayout = function() {
 	this.surface.css('transform', 'rotate3d(0, 0, 1, ' + this.rotation + 'deg)');
-};
-
-DrawR.prototype.setLayerCSS = function(layer) {
-	jQuery(layer.ctx.canvas).css({
-		opacity: layer.opacity / 100,
-		MozBlendMode: layer.blendMode,
-		WebkitBlendMode: layer.blendMode,
-		blendMode: layer.blendMode
-	});
+	
+	for (var i=0; i < this.layers.length; ++i) {
+		jQuery(this.layers[i].ctx.canvas).css({
+			opacity: this.layers[i].opacity / 100,
+			MozBlendMode: this.layers[i].blendMode,
+			WebkitBlendMode: this.layers[i].blendMode,
+			blendMode: this.layers[i].blendMode
+		});
+	}
 };
 
 DrawR.prototype.removeLayer = function (idx) {

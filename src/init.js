@@ -68,11 +68,11 @@ function DrawCtrl($scope) {
     });
 
     $scope.$watch('drawR.activeLayer.blendMode', function() {
-    	$scope.drawR.setLayerCSS($scope.drawR.activeLayer);
+    	$scope.drawR.refreshLayout();
     });
 
     $scope.$watch('drawR.activeLayer.opacity', function() {
-    	$scope.drawR.setLayerCSS($scope.drawR.activeLayer);
+    	$scope.drawR.refreshLayout();
     });
 
     $scope.toggleVisibility = function (layer) {
