@@ -515,6 +515,25 @@ DrawR.prototype.touchEnd = function (touch) {
     }
 };
 
+/**
+ * Returns a blob of a specified image region.
+ *  
+ * @param {DrawR.Layer} layer the layer to copy from
+ * @param {number} x the x coordinate of the region
+ * @param {number} y the y coordinate of the region
+ * @param {number} width the width coordinate of the region
+ * @param {number} height the height coordinate of the region
+ * @param {function(Blob)} fn the callback to call with the finished blob
+ */
+DrawR.prototype.copyImageRegion = function(layer, x, y, width, height, fn) {
+	var canvas = document.createElement('canvas');
+	canvas.width = width;
+	canvas.height = height;
+	var ctx = canvas.getContext('2d');
+	ctx.drawImage(layer.ctx.canvas, x, y, width, height, 0, 0, width, height);
+	canvas.toBlob(fn.bind(this));
+};
+
 DrawR.prototype.drawOutliner = function (touchPoints, start) {
     this.activeLayer.ctx.beginPath();
 
