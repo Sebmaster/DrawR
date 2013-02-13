@@ -422,7 +422,7 @@ DrawR.prototype.download = function (fn) {
 		ctx.globalAlpha = this.layers[i].opacity / 100;
 		ctx.drawImage(this.layers[i].ctx.canvas, 0, 0);
 	}
-    result.toBlob(fn);
+    result.toBlob(fn.bind(this));
 };
 
 DrawR.prototype.draw = function () {
