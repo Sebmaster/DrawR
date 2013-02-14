@@ -242,13 +242,12 @@ DrawR.prototype.touchMove = function (touch) {
     if (this['redrawDirty' + this.drawMode]) {
         requestAnimationFrame(this.draw.bind(this));
     } else {
-    	var $this = this;
-    	var len = $this.modifyOperations[touch.identifier].length;
+    	var len = this.modifyOperations[touch.identifier].length;
     	
-   		$this['draw' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
+   		this['draw' + this.drawMode](this.modifyOperations[touch.identifier], len - 2);
    		
-   		var dirty = $this['determineDirty' + $this.drawMode]($this.modifyOperations[touch.identifier], len - 2);
-   		$this.mergeCanvas(dirty.minX, dirty.minY, dirty.maxX - dirty.minX, dirty.maxY - dirty.minY);
+   		var dirty = this['determineDirty' + this.drawMode](this.modifyOperations[touch.identifier], len - 2);
+   		this.mergeCanvas(dirty.minX, dirty.minY, dirty.maxX - dirty.minX, dirty.maxY - dirty.minY);
     }
 };
 
