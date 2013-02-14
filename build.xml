@@ -25,6 +25,10 @@
 				<file name="bootstrap.min.js" />
 				<file name="init.js" />
 				<file name="drawr.js" />
+				<file name="drawr/utilities.js" />
+				<file name="drawr/layers.js" />
+				<file name="drawr/io.js" />
+				<file name="drawr/tools.js" />
 			</sources>
 		</compilejs>
 	</target>
