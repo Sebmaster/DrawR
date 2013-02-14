@@ -115,10 +115,12 @@ DrawR.prototype.drawLine = function (touchPoints, start) {
     this.activeLayer.ctx.strokeStyle = this.foregroundColor;
     this.activeLayer.ctx.stroke();
     
-    return {minX: touchPoints[0].x,
-    	    minY: touchPoints[0].y,
-    	    maxX: touchPoints[touchPoints.length - 1].x,
-    	    maxY: touchPoints[touchPoints.length - 1].y};
+    var lineRadius = Math.ceil(this.drawStyle.Line.lineWidth / 2);
+    
+    return {minX: Math.min(touchPoints[0].x, touchPoints[touchPoints.length - 1].x) - lineRadius,
+    	    minY: Math.min(touchPoints[0].y, touchPoints[touchPoints.length - 1].y) - lineRadius,
+    	    maxX: Math.max(touchPoints[0].x, touchPoints[touchPoints.length - 1].x) + lineRadius,
+    	    maxY: Math.max(touchPoints[0].y, touchPoints[touchPoints.length - 1].y) + lineRadius};
 };
 DrawR.prototype.redrawDirtyLine = true;
 
