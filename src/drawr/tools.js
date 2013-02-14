@@ -1,10 +1,7 @@
 DrawR.prototype.drawOutliner = function (touchPoints, start) {
     this.activeLayer.ctx.beginPath();
 
-    var lastX = touchPoints[start].x;
-    var lastY = touchPoints[start].y;
-
-    this.activeLayer.ctx.moveTo(lastX, lastY);
+    this.activeLayer.ctx.moveTo(touchPoints[start].x, touchPoints[start].y);
     for (var j = start + 1; j < touchPoints.length; ++j) {
         this.activeLayer.ctx.lineTo(touchPoints[j].x, touchPoints[j].y);
     }
@@ -38,10 +35,7 @@ DrawR.prototype.determineDirtyOutliner = function (touchPoints, start) {
 DrawR.prototype.drawBrush = function (touchPoints, start) {
     this.activeLayer.ctx.beginPath();
 
-    var lastX = touchPoints[start].x;
-    var lastY = touchPoints[start].y;
-
-    this.activeLayer.ctx.moveTo(lastX, lastY);
+    this.activeLayer.ctx.moveTo(touchPoints[start].x, touchPoints[start].y);
     for (var j = start; j < touchPoints.length; ++j) {
         this.activeLayer.ctx.lineTo(touchPoints[j].x, touchPoints[j].y);
     }
@@ -77,10 +71,7 @@ DrawR.prototype.determineDirtyBrush = function (touchPoints, start) {
 DrawR.prototype.drawEreaser = function (touchPoints, start) {
     this.activeLayer.ctx.beginPath();
 
-    var lastX = touchPoints[start].x;
-    var lastY = touchPoints[start].y;
-
-    this.activeLayer.ctx.moveTo(lastX, lastY);
+    this.activeLayer.ctx.moveTo(touchPoints[start].x, touchPoints[start].y);
     for (var j = start; j < touchPoints.length; ++j) {
         this.activeLayer.ctx.lineTo(touchPoints[j].x, touchPoints[j].y);
     }
