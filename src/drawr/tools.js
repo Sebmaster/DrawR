@@ -87,7 +87,7 @@ DrawR.prototype.drawEreaser = function (touchPoints, start) {
 DrawR.prototype.redrawDirtyEreaser = false;
 
 DrawR.prototype.determineDirtyEreaser = function (touchPoints, start) {
-    var lineWidth = this.drawStyle.Ereaser.lineWidth;
+    var lineWidth = Math.ceil(this.drawStyle.Ereaser.lineWidth / 2);
 	var minX = touchPoints[start].x;
 	var minY = touchPoints[start].y;
 	var maxX = minX;
@@ -100,10 +100,10 @@ DrawR.prototype.determineDirtyEreaser = function (touchPoints, start) {
         maxY = Math.max(touchPoints[j].y, maxY);
     }
     
-    return {minX: minX - lineWidth / 2,
-    	    minY: minY - lineWidth / 2,
-    	    maxX: maxX + lineWidth / 2,
-    	    maxY: maxY + lineWidth / 2};
+    return {minX: minX - lineWidth,
+    	    minY: minY - lineWidth,
+    	    maxX: maxX + lineWidth,
+    	    maxY: maxY + lineWidth};
 };
 
 DrawR.prototype.drawLine = function (touchPoints, start) {
