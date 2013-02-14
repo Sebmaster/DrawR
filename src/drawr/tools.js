@@ -14,6 +14,7 @@ DrawR.prototype.drawOutliner = function (touchPoints, start) {
 DrawR.prototype.redrawDirtyOutliner = false;
 
 DrawR.prototype.determineDirtyOutliner = function (touchPoints, start) {
+	var lineWidth = Math.ceil(this.drawStyle.Outliner.lineWidth / 2);
 	var minX = touchPoints[start].x;
 	var minY = touchPoints[start].y;
 	var maxX = minX;
@@ -26,10 +27,10 @@ DrawR.prototype.determineDirtyOutliner = function (touchPoints, start) {
         maxY = Math.max(touchPoints[j].y, maxY);
     }
     
-    return {minX: minX - this.drawStyle.Outliner.lineWidth / 2,
-    	    minY: minY - this.drawStyle.Outliner.lineWidth / 2,
-    	    maxX: maxX + this.drawStyle.Outliner.lineWidth / 2,
-    	    maxY: maxY + this.drawStyle.Outliner.lineWidth / 2};
+    return {minX: minX - lineWidth,
+    	    minY: minY - lineWidth,
+    	    maxX: maxX + lineWidth,
+    	    maxY: maxY + lineWidth};
 };
 
 DrawR.prototype.drawBrush = function (touchPoints, start) {
@@ -49,7 +50,7 @@ DrawR.prototype.drawBrush = function (touchPoints, start) {
 DrawR.prototype.redrawDirtyBrush = false;
 
 DrawR.prototype.determineDirtyBrush = function (touchPoints, start) {
-	var lineWidth = this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth + (this.drawStyle.Brush.lineWidth - this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth) * touchPoints[0].force;
+	var lineWidth = Math.ceil(this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth + (this.drawStyle.Brush.lineWidth - this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth) * touchPoints[0].force / 2);
 	var minX = touchPoints[start].x;
 	var minY = touchPoints[start].y;
 	var maxX = minX;
@@ -62,10 +63,10 @@ DrawR.prototype.determineDirtyBrush = function (touchPoints, start) {
         maxY = Math.max(touchPoints[j].y, maxY);
     }
     
-    return {minX: minX - lineWidth / 2,
-    	    minY: minY - lineWidth / 2,
-    	    maxX: maxX + lineWidth / 2,
-    	    maxY: maxY + lineWidth / 2};
+    return {minX: minX - lineWidth,
+    	    minY: minY - lineWidth,
+    	    maxX: maxX + lineWidth,
+    	    maxY: maxY + lineWidth};
 };
 
 DrawR.prototype.drawEreaser = function (touchPoints, start) {
@@ -125,6 +126,7 @@ DrawR.prototype.drawLine = function (touchPoints, start) {
 DrawR.prototype.redrawDirtyLine = true;
 
 DrawR.prototype.determineDirtyLine = function (touchPoints, start) {
+	var lineWidth = Math.ceil(this.drawStyle.Line.lineWidth / 2);
     var minX = touchPoints[0].x;
     var minY = touchPoints[0].y;
 
@@ -139,10 +141,10 @@ DrawR.prototype.determineDirtyLine = function (touchPoints, start) {
     }
 
     return {
-        minX: minX - Math.ceil(this.drawStyle.Line.lineWidth / 2),
-        minY: minY - Math.ceil(this.drawStyle.Line.lineWidth / 2),
-        maxX: maxX + Math.ceil(this.drawStyle.Line.lineWidth / 2),
-        maxY: maxY + Math.ceil(this.drawStyle.Line.lineWidth / 2)
+        minX: minX - lineWidth,
+        minY: minY - lineWidth,
+        maxX: maxX + lineWidth,
+        maxY: maxY + lineWidth
     };
 };
 
