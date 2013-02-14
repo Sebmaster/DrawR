@@ -257,10 +257,6 @@ DrawR.prototype.touchEnd = function (touch) {
 
     --this.touches;
     if (this.touches === 0) {
-    	if (this['redrawDirty' + this.drawMode]) {
-    		this.draw();
-    	}
-    	
         this.modifyOperations = {};
         var $this = this;
     	(self.setImmediate || self.setTimeout)(function() {
