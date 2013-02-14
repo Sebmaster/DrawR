@@ -81,7 +81,8 @@ DrawR.prototype.refreshLayout = function() {
 			opacity: this.layers[i].opacity / 100,
 			MozBlendMode: this.layers[i].blendMode,
 			WebkitBlendMode: this.layers[i].blendMode,
-			blendMode: this.layers[i].blendMode
+			blendMode: this.layers[i].blendMode,
+			visibility: this.layers[i].visible ? 'visible' : 'hidden'
 		});
 	}
 };
