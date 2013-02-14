@@ -10,6 +10,8 @@ DrawR.prototype.drawOutliner = function (touchPoints, start) {
     this.activeLayer.ctx.lineWidth = this.drawStyle.Outliner.minLineWidth * this.drawStyle.Outliner.lineWidth + (this.drawStyle.Outliner.lineWidth - this.drawStyle.Outliner.minLineWidth * this.drawStyle.Outliner.lineWidth) * touchPoints[start].force;
     this.activeLayer.ctx.lineJoin = this.activeLayer.ctx.lineCap = 'round';
     this.activeLayer.ctx.stroke();
+    
+    return this.determineDirtyOutliner(touchPoints, start);
 };
 DrawR.prototype.redrawDirtyOutliner = false;
 
@@ -45,6 +47,8 @@ DrawR.prototype.drawBrush = function (touchPoints, start) {
     this.activeLayer.ctx.lineWidth = this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth + (this.drawStyle.Brush.lineWidth - this.drawStyle.Brush.minLineWidth * this.drawStyle.Brush.lineWidth) * touchPoints[start].force;
     this.activeLayer.ctx.lineJoin = this.activeLayer.ctx.lineCap = 'round';
     this.activeLayer.ctx.stroke();
+    
+    return this.determineDirtyBrush(touchPoints, start);
 };
 
 DrawR.prototype.redrawDirtyBrush = false;
@@ -84,6 +88,8 @@ DrawR.prototype.drawEreaser = function (touchPoints, start) {
     this.activeLayer.ctx.lineJoin = this.activeLayer.ctx.lineCap = 'round';
     this.activeLayer.ctx.stroke();
     this.activeLayer.ctx.globalCompositeOperation = op;
+    
+    return this.determineDirtyEreaser(touchPoints, start);
 };
 DrawR.prototype.redrawDirtyEreaser = false;
 
