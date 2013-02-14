@@ -192,7 +192,7 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
     var stack = [[touchPoint.x, touchPoint.y]];
     var oldColor = target[touchPoint.x + touchPoint.y * width];
 
-    if (finalCol === oldColor) return;
+    if (finalCol === oldColor) return null;
 
     var minX = touchPoint.x;
     var minY = touchPoint.y;
