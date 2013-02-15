@@ -20,7 +20,7 @@ DrawR.prototype.load = function(blob, fn) {
 			
 			img.onload = function(layer, img) {
 				layer.ctx.drawImage(img, 0, 0);
-				layer.canvasData = layer.getImageData(0, 0, this.options.width, this.options.height);
+				layer.canvasData = layer.ctx.getImageData(0, 0, this.options.width, this.options.height);
 			}.bind(this, json.layers[i], img);
 			
 			offset += layerLengths[i];
