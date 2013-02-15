@@ -16,12 +16,12 @@ DrawR.prototype.load = function(blob, fn) {
 			var imageBlob = arrBuf.slice(offset, offset + layerLengths[i]);
 			var img = jQuery('<img>').prop('src', window.URL.createObjectURL(new Blob([imageBlob], {type: 'image/png'})))[0];
 			
-			var layer = json.layers[i].ctx = jQuery('<canvas>').prop({width: this.options.width, height: this.options.height})[0].getContext('2d');
+			json.layers[i].ctx = jQuery('<canvas>').prop({width: this.options.width, height: this.options.height})[0].getContext('2d');
 			
 			img.onload = function(layer, img) {
-				layer.drawImage(img, 0, 0);
+				layer.ctx.drawImage(img, 0, 0);
 				layer.canvasData = layer.getImageData(0, 0, this.options.width, this.options.height);
-			}.bind(this, layer, img);
+			}.bind(this, json.layers[i], img);
 			
 			offset += layerLengths[i];
 		}
