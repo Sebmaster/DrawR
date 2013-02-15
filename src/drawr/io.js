@@ -4,16 +4,16 @@ DrawR.prototype.load = function(blob, fn) {
 	
 	rd.onload = function(e) {
 		var arrBuf = e.target.result;
-		var stdLengths = new Uint32Array(arrBuf.slice(0, 8));
+		var stdLengths = new Uint32Array(arrBuf, 0, 2);
 		var jsonLength = stdLengths[0];
 		var layerCount = stdLengths[1];
 		
-		var layerLengths = new Uint32Array(arrBuf.slice(8, 8 + layerCount * 4));
-		var json = window.JSON.parse(String.fromCharCode.apply(undefined, new Uint16Array(arrBuf.slice(8 + layerCount * 4, 8 + layerCount * 4 + jsonLength))));
+		var layerLengths = new Uint32Array(arrBuf, 8, layerCount);
+		var json = window.JSON.parse(String.fromCharCode.apply(undefined, new Uint16Array(arrBuf, 8 + layerCount * 4, jsonLength / 2)));
 		
 		var offset = 8 + layerCount * 4 + jsonLength;
 		for (var i=0; i < layerCount; ++i) {
-			var imageBlob = arrBuf.slice(offset, offset + layerLengths[i]);
+			var imageBlob = new Uint8Array(arrBuf, offset, layerLengths[i]);
 			var img = jQuery('<img>').prop('src', window.URL.createObjectURL(new Blob([imageBlob], {type: 'image/png'})))[0];
 			
 			json.layers[i].ctx = jQuery('<canvas>').prop({width: this.options.width, height: this.options.height})[0].getContext('2d');
