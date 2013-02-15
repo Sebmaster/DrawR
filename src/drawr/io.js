@@ -33,6 +33,9 @@ DrawR.prototype.load = function(blob, fn) {
 		for (var i=0; i < this.layers.length; ++i) {
 			this.surface.append(this.layers[i].ctx.canvas);
 		}
+
+		this.refreshLayout();
+
 		if (fn) {
 			fn();
 		}
