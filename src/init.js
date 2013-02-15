@@ -29,8 +29,8 @@ function DrawCtrl($scope) {
 
     $scope.load = function () {
         jQuery('<input>').prop({type: 'file', accept: '.drawR,application/x.drawr,image/*'}).change(function () {
-        	$scope.drawR.load(this.files[0], $scope.$apply);
-        }).click();
+			$scope.drawR.load(this.files[0], $scope.$apply.bind($scope));
+        }).appendTo('body').css({position: 'fixed', left: '-99999px'}).focus().click();
     };
 
     $scope.drawTool = function (tool) {
