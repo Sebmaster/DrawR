@@ -20,6 +20,12 @@ function DrawR(surface, globalSurface, options) {
     this.toggleActive(this.addLayer(0));
 	
     this.modifyOperations = {};
+    
+    /** @type {Array.<Array.<{layer: !DrawR.Layer, data: !Blob}>>} */
+    this.forwardLog = [];
+    this.activeLayer.ctx.canvas.toBlob(function(blob) {
+		this.forwardLog[0] = [{layer: this.activeLayer, data: blob}];
+    }.bind(this));
 
     this.drawStyle = {
         Outliner: {
@@ -74,6 +80,11 @@ DrawR.prototype.drawMode = DrawR.BrushModes.BRUSH;
  * @type {number}
  */
 DrawR.prototype.touches = 0;
+/**
+ * @private
+ * @type {number}
+ */
+DrawR.prototype.forwardLogPtr = 0;
 /**
  * @private
  * @type {number}
@@ -228,7 +239,6 @@ DrawR.prototype.touchStart = function (touch) {
     this.modifyOperations[touch.identifier].push(touch);
 
     this['draw' + this.drawMode](this.modifyOperations[touch.identifier], 0);
-
     ++this.touches;
 };
 
@@ -240,13 +250,11 @@ DrawR.prototype.touchMove = function (touch) {
     this.modifyOperations[touch.identifier].push(touch);
 
     if (this['redrawDirty' + this.drawMode]) {
-        requestAnimationFrame(this.draw.bind(this));
+        this.draw();
     } else {
     	var len = this.modifyOperations[touch.identifier].length;
+    	var dirty = this['draw' + this.drawMode](this.modifyOperations[touch.identifier], len - 2);
     	
-   		this['draw' + this.drawMode](this.modifyOperations[touch.identifier], len - 2);
-   		
-   		var dirty = this['determineDirty' + this.drawMode](this.modifyOperations[touch.identifier], len - 2);
    		this.mergeCanvas(dirty.minX, dirty.minY, dirty.maxX - dirty.minX, dirty.maxY - dirty.minY);
     }
 };
@@ -258,10 +266,41 @@ DrawR.prototype.touchEnd = function (touch) {
     if (this.touches === 0) {
         this.modifyOperations = {};
         var $this = this;
+        $this.activeLayer.ctx.canvas.toBlob(function(blob) {
+        	var diff = $this.forwardLog.length - 1 - $this.forwardLogPtr;
+        	if (diff !== 0) {
+        		$this.forwardLog.splice($this.forwardLogPtr + 1, diff);
+        	}
+        	
+			$this.forwardLog[$this.forwardLog.length] = [{layer: $this.activeLayer, data: blob}];
+			++$this.forwardLogPtr;
+        });
     	(self.setImmediate || self.setTimeout)(function() {
         	$this.activeLayer.canvasData = $this.activeLayer.ctx.getImageData(0, 0, $this.options.width, $this.options.height);
     	}, 0);
     }
+};
+
+DrawR.prototype.undo = function() {
+	if (this.forwardLogPtr !== 0) {
+		var logEntry = this.forwardLog[this.forwardLogPtr - 1];
+		
+		for (var i=0; i < logEntry.length; ++i) {
+			if (this.layers.indexOf(logEntry[i].layer) === -1) {
+				this.layers.push(logEntry[i].layer);
+			}
+			var img = new Image();
+			img.onload = function(ctx) {
+				var op = ctx.globalCompositeOperation;
+				ctx.globalCompositeOperation = 'copy';
+				ctx.drawImage(this, 0, 0);
+				ctx.globalCompositeOperation = op;
+			}.bind(img, logEntry[i].layer.ctx);
+			img.src = window.URL.createObjectURL(logEntry[i].data);
+		}
+		
+		--this.forwardLogPtr;
+	}
 };
 
 /**

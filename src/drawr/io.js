@@ -11,20 +11,26 @@ DrawR.prototype.load = function(blob, fn) {
 		var layerLengths = new Uint32Array(arrBuf, 8, layerCount);
 		var json = window.JSON.parse(String.fromCharCode.apply(undefined, new Uint16Array(arrBuf, 8 + layerCount * 4, jsonLength / 2)));
 		
+		var forwardLog = [];
+		
 		var offset = 8 + layerCount * 4 + jsonLength;
 		for (var i=0; i < layerCount; ++i) {
-			var imageBlob = new Uint8Array(arrBuf, offset, layerLengths[i]);
-			var img = jQuery('<img>').prop('src', window.URL.createObjectURL(new Blob([imageBlob], {type: 'image/png'})))[0];
+			var imageBlob = new Blob([new Uint8Array(arrBuf, offset, layerLengths[i])], {type: 'image/png'});
+			var img = jQuery('<img>').prop('src', window.URL.createObjectURL(imageBlob))[0];
 			
 			json.layers[i].ctx = jQuery('<canvas>').prop({width: this.options.width, height: this.options.height})[0].getContext('2d');
 			
-			img.onload = function(layer, img) {
+			img.onload = function(layer, img, blob) {
 				layer.ctx.drawImage(img, 0, 0);
 				layer.canvasData = layer.ctx.getImageData(0, 0, this.options.width, this.options.height);
-			}.bind(this, json.layers[i], img);
+				
+				forwardLog[forwardLog.length] = {layer: layer, data: blob};
+			}.bind(this, json.layers[i], img, imageBlob);
 			
 			offset += layerLengths[i];
 		}
+		
+		this.forwardLog[0] = forwardLog;
 		
 		this.options = json.options;
 		this.layers = json.layers;
