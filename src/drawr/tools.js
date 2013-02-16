@@ -166,7 +166,8 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
     col[2] = parseInt(drawStyle.substr(5, 2), 16);
 
     var origData = this.activeLayer.ctx.getImageData(0, 0, this.options.width, this.options.height);
-    if (self.CanvasPixelArray && origData.data instanceof self.CanvasPixelArray) { // IE hack because data is an array
+	var exactData = origData.data;
+    if (self.CanvasPixelArray && exactData instanceof self.CanvasPixelArray) { // IE hack because data is an array
     	data = new Uint8Array(origData.data);
     } else {
     	data = origData.data;
@@ -231,14 +232,14 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
         }
     }
 
-	if (self.CanvasPixelArray && origData.data instanceof self.CanvasPixelArray) {
+	if (self.CanvasPixelArray && exactData instanceof self.CanvasPixelArray) {
 		for (var i=minY; i <= maxY + 1; ++i) {
 			for (var j=minX; j <= maxX + 1; ++j) {
 				var pos = (j + i * width) * 4;
-				origData[pos] = data[pos];
-				origData[pos + 1] = data[pos + 1];
-				origData[pos + 2] = data[pos + 2];
-				origData[pos + 3] = data[pos + 3];
+				exactData[pos] = data[pos];
+				exactData[pos + 1] = data[pos + 1];
+				exactData[pos + 2] = data[pos + 2];
+				exactData[pos + 3] = data[pos + 3];
 			}
 		}
 	}
