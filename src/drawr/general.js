@@ -285,7 +285,6 @@ DrawR.prototype.touchEnd = function (touch) {
     	
 		this.forwardLog[this.forwardLog.length] = [{layer: this.activeLayer, img: img}];
 		++this.forwardLogPtr;
-       
     }
 };
 
