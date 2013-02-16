@@ -21,11 +21,12 @@ function DrawR(surface, globalSurface, options) {
 	
     this.modifyOperations = {};
     
-    /** @type {Array.<Array.<{layer: !DrawR.Layer, data: !Blob}>>} */
+    /** @type {Array.<Array.<{layer: !DrawR.Layer, data: !Image}>>} */
     this.forwardLog = [];
-    this.activeLayer.ctx.canvas.toBlob(function(blob) {
-		this.forwardLog[0] = [{layer: this.activeLayer, data: blob}];
-    }.bind(this));
+	var img = document.createElement('canvas');
+	img.width = 1;
+	img.height = 1;
+	this.forwardLog[0] = [{layer: this.activeLayer, img: img}];
 
     this.drawStyle = {
         Outliner: {
@@ -272,17 +273,17 @@ DrawR.prototype.touchEnd = function (touch) {
         this.modifyOperations = {};
         var $this = this;
         $this.activeLayer.ctx.canvas.toBlob(function(blob) {
+			var img = new Image();
+			img.src = window.URL.createObjectURL(blob);
+			$this.activeLayer.img = img;
+			
         	var diff = $this.forwardLog.length - 1 - $this.forwardLogPtr;
         	if (diff !== 0) {
         		$this.forwardLog.splice($this.forwardLogPtr + 1, diff);
         	}
         	
-			$this.forwardLog[$this.forwardLog.length] = [{layer: $this.activeLayer, data: blob}];
+			$this.forwardLog[$this.forwardLog.length] = [{layer: $this.activeLayer, img: img}];
 			++$this.forwardLogPtr;
-			
-			var img = new Image();
-			img.src = window.URL.createObjectURL(blob);
-			$this.activeLayer.img = img;
         });
     }
 };
@@ -295,14 +296,11 @@ DrawR.prototype.undo = function() {
 			if (this.layers.indexOf(logEntry[i].layer) === -1) {
 				this.layers.push(logEntry[i].layer);
 			}
-			var img = new Image();
-			img.onload = function(ctx) {
-				var op = ctx.globalCompositeOperation;
-				ctx.globalCompositeOperation = 'copy';
-				ctx.drawImage(this, 0, 0);
-				ctx.globalCompositeOperation = op;
-			}.bind(img, logEntry[i].layer.ctx);
-			img.src = window.URL.createObjectURL(logEntry[i].data);
+			var ctx = logEntry[i].layer.ctx;
+			var op = ctx.globalCompositeOperation;
+			ctx.globalCompositeOperation = 'copy';
+			ctx.drawImage(logEntry[i].img, 0, 0, this.options.width, this.options.height);
+			ctx.globalCompositeOperation = op;
 		}
 		
 		--this.forwardLogPtr;

@@ -20,7 +20,7 @@ DrawR.prototype.load = function(blob, fn) {
 			
 			json.layers[i].ctx = jQuery('<canvas>').prop({width: this.options.width, height: this.options.height})[0].getContext('2d');
 			json.layers[i].img = img;
-			forwardLog[forwardLog.length] = {layer: json.layers[i], data: imageBlob};
+			forwardLog[forwardLog.length] = {layer: json.layers[i], img: img};
 			
 			img.onload = function(layer) {
 				layer.ctx.drawImage(this, 0, 0);
