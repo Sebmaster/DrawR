@@ -24,9 +24,15 @@ DrawR.prototype.addLayer = function(idx) {
     	visible: true,
     	blendMode: 'normal',
     	opacity: 100,
-    	canvasData: ctx.createImageData(this.options.width, this.options.height)
+    	img: null
 	};
     this.layers.splice(idx, 0, layer);
+    
+    startCanvas[0].toBlob(function(blob) {
+    	var img = new Image();
+    	img.src = window.URL.createObjectURL(blob);
+		layer.img = img;
+    });
     
     this.refreshLayout();
     

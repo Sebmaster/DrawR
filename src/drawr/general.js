@@ -50,7 +50,7 @@ function DrawR(surface, globalSurface, options) {
     this.bindEvents();
 }
 
-/** @typedef {{ctx: CanvasRenderingContext2D, visible: boolean, blendMode: string, opacity: number, canvasData: ImageData}} */
+/** @typedef {{ctx: CanvasRenderingContext2D, visible: boolean, blendMode: string, opacity: number, img: Image}} */
 DrawR.Layer;
 
 /**
@@ -206,7 +206,10 @@ DrawR.prototype.draw = function () {
         maxY = Math.max(dirty.maxY, maxY);
     }
 
-    this.activeLayer.ctx.putImageData(this.activeLayer.canvasData, 0, 0, minX, minY, maxX - minX, maxY - minY);
+	var op = this.activeLayer.ctx.globalCompositeOperation;
+	this.activeLayer.ctx.globalCompositeOperation = 'copy';
+    this.activeLayer.ctx.drawImage(this.activeLayer.img, 0,0,this.options.width, this.options.height);
+    this.activeLayer.ctx.globalCompositeOperation = op;
 
     for (var i in this.modifyOperations) {
         this['draw' + this.drawMode](this.modifyOperations[i], 0);
@@ -274,10 +277,11 @@ DrawR.prototype.touchEnd = function (touch) {
         	
 			$this.forwardLog[$this.forwardLog.length] = [{layer: $this.activeLayer, data: blob}];
 			++$this.forwardLogPtr;
+			
+			var img = new Image();
+			img.src = window.URL.createObjectURL(blob);
+			$this.activeLayer.img = img;
         });
-    	(self.setImmediate || self.setTimeout)(function() {
-        	$this.activeLayer.canvasData = $this.activeLayer.ctx.getImageData(0, 0, $this.options.width, $this.options.height);
-    	}, 0);
     }
 };
 

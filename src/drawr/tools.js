@@ -157,6 +157,7 @@ DrawR.prototype.determineDirtyLine = function (touchPoints, start) {
 DrawR.prototype.drawBucket = function (touchPoints, start) {
     var width = this.options.width;
     var height = this.options.height;
+	var data;
 
     var col = [0, 0, 0];
     var drawStyle = this.foregroundColor;
@@ -164,9 +165,11 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
     col[1] = parseInt(drawStyle.substr(3, 2), 16);
     col[2] = parseInt(drawStyle.substr(5, 2), 16);
 
-    var data = this.activeLayer.canvasData.data;
-    if (self.CanvasPixelArray && data instanceof self.CanvasPixelArray) { // IE hack because data is an array
-    	data = new Uint8Array(data);
+    var origData = this.activeLayer.ctx.getImageData(0, 0, this.options.width, this.options.height);
+    if (self.CanvasPixelArray && origData.data instanceof self.CanvasPixelArray) { // IE hack because data is an array
+    	data = new Uint8Array(origData.data);
+    } else {
+    	data = origData.data;
     }
     var target = new Int32Array(data.buffer);
     var finalCol;
@@ -228,20 +231,18 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
         }
     }
 
-	if (self.CanvasPixelArray && this.activeLayer.canvasData.data instanceof self.CanvasPixelArray) {
-		var backData = this.activeLayer.canvasData.data;
-		
+	if (self.CanvasPixelArray && origData.data instanceof self.CanvasPixelArray) {
 		for (var i=minY; i <= maxY + 1; ++i) {
 			for (var j=minX; j <= maxX + 1; ++j) {
 				var pos = (j + i * width) * 4;
-				backData[pos] = data[pos];
-				backData[pos + 1] = data[pos + 1];
-				backData[pos + 2] = data[pos + 2];
-				backData[pos + 3] = data[pos + 3];
+				origData[pos] = data[pos];
+				origData[pos + 1] = data[pos + 1];
+				origData[pos + 2] = data[pos + 2];
+				origData[pos + 3] = data[pos + 3];
 			}
 		}
 	}
-    this.activeLayer.ctx.putImageData(this.activeLayer.canvasData, 0, 0, minX, minY, maxX - minX + 1, maxY - minY + 1);
+    this.activeLayer.ctx.putImageData(origData, 0, 0, minX, minY, maxX - minX + 1, maxY - minY + 1);
     
     return {minX: minX,
     	    minY: minY,

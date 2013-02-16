@@ -19,13 +19,12 @@ DrawR.prototype.load = function(blob, fn) {
 			var img = jQuery('<img>').prop('src', window.URL.createObjectURL(imageBlob))[0];
 			
 			json.layers[i].ctx = jQuery('<canvas>').prop({width: this.options.width, height: this.options.height})[0].getContext('2d');
+			json.layers[i].img = img;
+			forwardLog[forwardLog.length] = {layer: json.layers[i], data: imageBlob};
 			
-			img.onload = function(layer, img, blob) {
-				layer.ctx.drawImage(img, 0, 0);
-				layer.canvasData = layer.ctx.getImageData(0, 0, this.options.width, this.options.height);
-				
-				forwardLog[forwardLog.length] = {layer: layer, data: blob};
-			}.bind(this, json.layers[i], img, imageBlob);
+			img.onload = function(layer) {
+				layer.ctx.drawImage(this, 0, 0);
+			}.bind(img, json.layers[i]);
 			
 			offset += layerLengths[i];
 		}
