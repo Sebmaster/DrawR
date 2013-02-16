@@ -253,23 +253,3 @@ DrawR.prototype.redrawDirtyBucket = false;
 DrawR.prototype.determineDirtyBucket = function (touchPoints, start) {
     return null;
 };
-
-DrawR.prototype.hsvFilter = function(h, s, v) {
-    var imageData = this.activeLayer.canvasData.data;
-    
-    for (var i=0; i < this.options.width; ++i) {
-        for (var j=0; j < this.options.height; ++j) {
-            var pos = i * this.options.height + j;
-            var hsv = DrawR.rgbToHsv(imageData[pos], imageData[pos + 1], imageData[pos + 2]);
-            hsv.h += h;
-            hsv.s += s;
-            hsv.v += v;
-            var rgb = DrawR.hsvToRgb(hsv.h, hsv.s, hsv.v);
-            imageData[pos] = rgb.r;
-            imageData[pos + 1] = rgb.g;
-            imageData[pos + 2] = rgb.b;
-        }
-    }
-    
-    this.activeLayer.ctx.putImageData(this.activeLayer.canvasData, 0, 0);
-};
