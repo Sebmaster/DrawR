@@ -271,20 +271,21 @@ DrawR.prototype.touchEnd = function (touch) {
     --this.touches;
     if (this.touches === 0) {
         this.modifyOperations = {};
-        var $this = this;
-        $this.activeLayer.ctx.canvas.toBlob(function(blob) {
-			var img = new Image();
-			img.src = window.URL.createObjectURL(blob);
-			$this.activeLayer.img = img;
-			
-        	var diff = $this.forwardLog.length - 1 - $this.forwardLogPtr;
-        	if (diff !== 0) {
-        		$this.forwardLog.splice($this.forwardLogPtr + 1, diff);
-        	}
-        	
-			$this.forwardLog[$this.forwardLog.length] = [{layer: $this.activeLayer, img: img}];
-			++$this.forwardLogPtr;
-        });
+        
+		var img = document.createElement('canvas');
+		img.width = this.options.width;
+		img.height = this.options.height;
+		img.getContext('2d').drawImage(this.activeLayer.ctx.canvas, 0, 0);
+		
+		this.activeLayer.img = img;
+    	var diff = this.forwardLog.length - 1 - this.forwardLogPtr;
+    	if (diff !== 0) {
+    		this.forwardLog.splice(this.forwardLogPtr + 1, diff);
+    	}
+    	
+		this.forwardLog[this.forwardLog.length] = [{layer: this.activeLayer, img: img}];
+		++this.forwardLogPtr;
+       
     }
 };
 
