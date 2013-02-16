@@ -258,7 +258,9 @@ DrawR.prototype.touchMove = function (touch) {
     	var len = this.modifyOperations[touch.identifier].length;
     	var dirty = this['draw' + this.drawMode](this.modifyOperations[touch.identifier], len - 2);
     	
-   		this.mergeCanvas(dirty.minX, dirty.minY, dirty.maxX - dirty.minX, dirty.maxY - dirty.minY);
+    	if (dirty !== null) {
+   			this.mergeCanvas(dirty.minX, dirty.minY, dirty.maxX - dirty.minX, dirty.maxY - dirty.minY);
+    	}
     }
 };
 
