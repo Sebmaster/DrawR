@@ -146,6 +146,7 @@ DrawCtrl.prototype.bindEvents = function($scope) {
 			$scope.$apply();
 		} else if (evt.keyCode === 90 && evt.ctrlKey) { // undo
 			$scope.drawR.undo();
+			$scope.apply();
 		}
 	}).on('keyup', function(evt) {
 		if (evt.keyCode === 16) { // shift key (temp eraser)
