@@ -295,6 +295,7 @@ DrawR.prototype.undo = function() {
 		for (var i=0; i < logEntry.length; ++i) {
 			if (this.layers.indexOf(logEntry[i].layer) === -1) {
 				this.layers.push(logEntry[i].layer);
+				this.surface.append(logEntry[i].layer.ctx.canvas);
 			}
 			var ctx = logEntry[i].layer.ctx;
 			var op = ctx.globalCompositeOperation;
