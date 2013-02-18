@@ -163,7 +163,7 @@ DrawR.prototype.bindEvents = function () {
             if (evt.which !== 1) return;
 
             evt.preventDefault();
-            $this.touchStart({ x: evt.offsetX, y: evt.offsetY, identifier: -1, force: 0 });
+            $this.touchStart({ x: evt.offsetX !== undefined ? evt.offsetX : evt.originalEvent.layerX, y: evt.offsetY !== undefined ? evt.offsetY : evt.originalEvent.layerY, identifier: -1, force: 0 });
 
             $this.globalSurface.one('mouseup mouseleave', function (evt) {
                 $this.touchEnd({ identifier: -1 });
@@ -186,7 +186,7 @@ DrawR.prototype.bindEvents = function () {
 
             evt.preventDefault();
 
-            $this.touchMove({ x: evt.offsetX, y: evt.offsetY, identifier: -1, force: 0 });
+            $this.touchMove({ x: evt.offsetX !== undefined ? evt.offsetX : evt.originalEvent.layerX, y: evt.offsetY !== undefined ? evt.offsetY : evt.originalEvent.layerY, identifier: -1, force: 0 });
         })
     }
 };
