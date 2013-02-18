@@ -75,6 +75,10 @@ function DrawCtrl($scope) {
     	$scope.drawR.refreshLayout();
     });
 
+    $scope.$watch('drawR.rotation', function() {
+    	$scope.drawR.refreshLayout();
+    });
+
     $scope.toggleVisibility = function (layer) {
         if (layer.visible) {
             $scope.drawR.hideLayer(layer);
