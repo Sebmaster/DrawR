@@ -193,43 +193,50 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
 
     var touchPoint = touchPoints[touchPoints.length - 1];
 
-    var stack = [[touchPoint.x, touchPoint.y]];
-    var oldColor = target[touchPoint.x + touchPoint.y * width];
-
-    if (finalCol === oldColor) return null;
-
     var minX = touchPoint.x;
     var minY = touchPoint.y;
     var maxX = minX;
     var maxY = minY;
     var now;
 
+    var stack = [[touchPoint.x, touchPoint.y]];
+
+    var oldColor = target[touchPoint.x + touchPoint.y * width];
+    if (finalCol === oldColor) return null;
+
     while (now = stack.shift()) {
-        var arrPos = now[0] + now[1] * width;
+    	var spanLeft = false;
+    	var spanRight = false;
+    	
+    	minX = Math.min(minX, now[0]);
+    	maxX = Math.max(maxX, now[0]);
+    	
+    	var y1 = now[1];
+    	while (y1 >= 0 && target[now[0] + y1 * width] === oldColor) --y1;
+		y1++;
+		
+    	minY = Math.min(minY, y1);
 
-        var myColor = target[arrPos];
+		while (y1 < height && target[now[0] + y1 * width] === oldColor) {
+			target[now[0] + y1 * width] = finalCol;
 
-        if (myColor !== oldColor) continue;
-
-        minX = Math.min(now[0], minX);
-        minY = Math.min(now[1], minY);
-        maxX = Math.max(now[0], maxX);
-        maxY = Math.max(now[1], maxY);
-
-        target[arrPos] = finalCol;
-
-        if (now[0] > 0) {
-            stack.push([now[0] - 1, now[1]]);
-        }
-        if (now[0] < this.options.width - 1) {
-            stack.push([now[0] + 1, now[1]]);
-        }
-        if (now[1] > 0) {
-            stack.push([now[0], now[1] - 1]);
-        }
-        if (now[1] < this.options.height - 1) {
-            stack.push([now[0], now[1] + 1]);
-        }
+	        if (!spanLeft && now[0] > 0 && target[(now[0] - 1) + y1 * width] === oldColor) {
+	            stack.push([now[0] - 1, y1]);
+	            spanLeft = true;
+	        } else if (now[0] > 0 && target[(now[0] - 1) + y1 * width] !== oldColor) {
+	            spanLeft = false;
+	        }
+	
+	        if (!spanRight && now[0] < width - 1 && target[(now[0] + 1) + y1 * width] === oldColor) {
+	            stack.push([now[0] + 1, y1]);
+	            spanRight = true;
+	        } else if (now[0] < width - 1 && target[(now[0] + 1) + y1 * width] !== oldColor) {
+	            spanRight = false;
+	        }
+	        ++y1;
+		}
+		
+    	maxY = Math.max(maxY, y1);
     }
 
 	if (self.CanvasPixelArray && exactData instanceof self.CanvasPixelArray) {
@@ -243,7 +250,7 @@ DrawR.prototype.drawBucket = function (touchPoints, start) {
 			}
 		}
 	}
-    this.activeLayer.ctx.putImageData(origData, 0, 0, minX, minY, maxX - minX + 1, maxY - minY + 1);
+    this.activeLayer.ctx.putImageData(origData, 0, 0, minX, minY, maxX - minX, maxY - minY);
     
     return {minX: minX,
     	    minY: minY,
