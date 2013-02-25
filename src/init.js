@@ -166,6 +166,10 @@ DrawCtrl.prototype.initSurface = function($scope) {
     $scope.drawR.layers[0].name = 'Background';
 
     $scope.selectedLayer = $scope.drawR.layers[0];
+    jQuery('#colorpicker .pointer').css({
+    	top: '',
+    	left: ''
+    });
 };
 
 DrawCtrl.prototype.changeColor = function($scope) {
