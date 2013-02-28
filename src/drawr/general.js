@@ -13,7 +13,10 @@ function DrawR(surface, globalSurface, options) {
     }, options));
 
     this.globalSurface = jQuery(globalSurface);
-    this.surface = jQuery(surface);
+    this.surface = jQuery(surface).on('contextmenu', function() {
+    	return false;
+    });
+    
     /** @type {Array.<DrawR.Layer>} */
     this.layers = [];
 	
