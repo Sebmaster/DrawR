@@ -6,7 +6,7 @@ var app = express();
 
 app.use(express.bodyParser());
 app.use(lessMiddleware({ src: __dirname + '/public', optimization: 2 }));
-app.use(express.static(__dirname + '/public', { maxAge: 86400000 }));
+app.use(express.static(__dirname + '/public'));
 
 var i = 0;
 
