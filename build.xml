@@ -20,6 +20,8 @@
 			</externs>
 
 			<sources dir="${src}">
+				<file name="jquery.js" />
+				<file name="angular.js" />
 				<file name="canvas-toBlob.js" />
 				<file name="filesaver.js" />
 				<file name="bootstrap.min.js" />
