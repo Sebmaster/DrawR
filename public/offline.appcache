@@ -5,10 +5,7 @@ SETTINGS:
 prefer-online
 
 CACHE:
-
-# Javascript
-http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js
-http://ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js
+index.html
 
 js/script.min.js
 
@@ -46,4 +43,4 @@ NETWORK:
 *
 
 FALLBACK:
-/ drawr.html
+/ index.html
