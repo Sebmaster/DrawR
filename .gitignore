@@ -1,6 +1,0 @@
-node_modules
-public/js/script.min.js
-.project
-.settings
-.externalToolBuilders
-public/css/style*.css
