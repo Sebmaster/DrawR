@@ -63,7 +63,7 @@ DrawR.prototype.save = function(fn) {
 			lengths[i + 2] = canvasData[i].size;
 		
 			layers[i].ctx = null;
-			layers[i].canvasData = null;
+			layers[i].img = null;
 			
 			++finished;
 			continueGen();
