@@ -4,54 +4,54 @@
  * @param {number} idx the index to add the layer at
  * @return {DrawR.Layer}
  */
-DrawR.prototype.addLayer = function(idx) {
+DrawR.prototype.addLayer = function (idx) {
 	var startCanvas = jQuery('<canvas>').prop({ width: this.options.width, height: this.options.height });
-	
+
 	if (idx === 0) {
-    	startCanvas.prependTo(this.surface);
+		startCanvas.prependTo(this.surface);
 	} else {
-    	startCanvas.insertAfter(this.layers[idx - 1].ctx.canvas);
+		startCanvas.insertAfter(this.layers[idx - 1].ctx.canvas);
 	}
 
-    var ctx = startCanvas[0].getContext('2d');
-    ctx.translate(0.5, 0.5);
-    ctx.imageSmoothingEnabled = false;
-    ctx.mozImageSmoothingEnabled = false;
-    ctx.webkitImageSmoothingEnabled = false;
-    
-    var layer = {
-    	ctx: ctx,
-    	visible: true,
-    	blendMode: 'normal',
-    	opacity: 100,
-    	img: null
+	var ctx = startCanvas[0].getContext('2d');
+	ctx.translate(0.5, 0.5);
+	ctx.imageSmoothingEnabled = false;
+	ctx.mozImageSmoothingEnabled = false;
+	ctx.webkitImageSmoothingEnabled = false;
+
+	var layer = {
+		ctx: ctx,
+		visible: true,
+		blendMode: 'normal',
+		opacity: 100,
+		img: null
 	};
-    this.layers.splice(idx, 0, layer);
-    
-    startCanvas[0].toBlob(function(blob) {
-    	var img = new Image();
-    	img.src = window.URL.createObjectURL(blob);
+	this.layers.splice(idx, 0, layer);
+
+	startCanvas[0].toBlob(function (blob) {
+		var img = new Image();
+		img.src = window.URL.createObjectURL(blob);
 		layer.img = img;
-    });
-    
-    this.refreshLayout();
-    
-    return layer;
+	});
+
+	this.refreshLayout();
+
+	return layer;
 };
 
 DrawR.prototype.removeLayer = function (idx) {
-    var layer = this.layers.splice(idx, 1)[0];
-    jQuery(layer.ctx.canvas).remove();
+	var layer = this.layers.splice(idx, 1)[0];
+	jQuery(layer.ctx.canvas).remove();
 };
 
 DrawR.prototype.showLayer = function (layer) {
-    layer.visible = true;
-    jQuery(layer.ctx.canvas).css('visibility', '');
+	layer.visible = true;
+	jQuery(layer.ctx.canvas).css('visibility', '');
 };
 
 DrawR.prototype.hideLayer = function (layer) {
-    layer.visible = false;
-    jQuery(layer.ctx.canvas).css('visibility', 'hidden');
+	layer.visible = false;
+	jQuery(layer.ctx.canvas).css('visibility', 'hidden');
 };
 
 /**
@@ -60,29 +60,29 @@ DrawR.prototype.hideLayer = function (layer) {
  * 
  * @param {DrawR.Layer} layer the layer to toggle
  */
-DrawR.prototype.toggleActive = function(layer) {
-    if (this.activeLayer === layer) {
-        this.activeLayer = null;
-    } else {
-        this.activeLayer = layer;
-    }
-};
-
-DrawR.prototype.moveLayer = function(from, to) {
-	if (to > from) {
-    	jQuery(this.layers[to].ctx.canvas).after(this.layers[from].ctx.canvas);
+DrawR.prototype.toggleActive = function (layer) {
+	if (this.activeLayer === layer) {
+		this.activeLayer = null;
 	} else {
-    	jQuery(this.layers[to].ctx.canvas).before(this.layers[from].ctx.canvas);
+		this.activeLayer = layer;
 	}
-    
-    var layer = this.layers.splice(from, 1)[0];
-    this.layers.splice(to, 0, layer);
 };
 
-DrawR.prototype.refreshLayout = function() {
+DrawR.prototype.moveLayer = function (from, to) {
+	if (to > from) {
+		jQuery(this.layers[to].ctx.canvas).after(this.layers[from].ctx.canvas);
+	} else {
+		jQuery(this.layers[to].ctx.canvas).before(this.layers[from].ctx.canvas);
+	}
+
+	var layer = this.layers.splice(from, 1)[0];
+	this.layers.splice(to, 0, layer);
+};
+
+DrawR.prototype.refreshLayout = function () {
 	this.surface.css('transform', 'rotate3d(0, 0, 1, ' + this.rotation + 'deg)');
-	
-	for (var i=0; i < this.layers.length; ++i) {
+
+	for (var i = 0; i < this.layers.length; ++i) {
 		jQuery(this.layers[i].ctx.canvas).css({
 			opacity: this.layers[i].opacity / 100,
 			MozBlendMode: this.layers[i].blendMode,

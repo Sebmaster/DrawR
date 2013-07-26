@@ -1,101 +1,115 @@
 ﻿body {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+    position: absolute;
+    width: 100%;
+    height: 100%;
 }
-#content {
-  height: -webkit-calc(100% -  50px);
-  height: calc(100% -  50px);
-}
-#drawTools {
-  position: fixed;
-  width: 220px;
-  height: -webkit-calc(100% - 10px);
-  height: calc(100% - 10px);
-  padding: 5px;
-}
-@media print {
-  #drawTools {
-    display: none;
-  }
-}
-#drawTools .activeColor {
-  width: 30px;
-  height: 30px;
-}
-.colorpicker {
-  margin: 20px 0 30px 0;
-}
-.colorpicker .slider {
-  /*@gradient: left, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120,100%, 50%), hsl(180, 100%, 50%), hsl(240,100%,50%),hsl(300,100%,50%);*/
 
-  width: 150px;
-  height: 15px;
-  margin: 0 auto;
-  background: -webkit-linear-gradient(left, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
-  background: -moz-linear-gradient(left, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
-  background: -ms-linear-gradient(left, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
-  background: linear-gradient(left, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+#content {
+    height: -webkit-calc(100% - 50px);
+    height: calc(100% - 50px);
 }
-.colorpicker .slider + input {
-  display: block;
-  width: 160px;
-  margin: 0 auto;
+
+#drawTools {
+    position: fixed;
+    width: 220px;
+    height: -webkit-calc(100% - 10px);
+    height: calc(100% - 10px);
+    padding: 5px;
 }
-.colorpicker .chooser {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  margin: 0 auto;
-  cursor: crosshair;
-  background-color: hsl(attr(data-hue number), 50%, 100%);
-  background-image: url(../img/cp_overlay.png);
-}
-#surfaceContainer {
-  position: fixed;
-  left: 230px;
-  width: -webkit-calc(100% -  490px);
-  width: calc(100% -  490px);
-  height: 100%;
-  margin: 0 auto;
-  overflow: auto;
-}
-#drawSurface {
-  position: relative;
-  margin: 0 auto;
-  -ms-touch-action: none;
-  background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
-  background-image: -webkit-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), -webkit-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
-  background-image: -moz-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), -moz-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
-  background-image: -ms-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), -ms-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
-  background-image: -o-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), -o-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
-  background-image: linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
-}
-#drawSurface canvas {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  image-rendering: -o-crisp-edges;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: -moz-optimize-contrast;
-  -ms-interpolation-mode: nearest-neighbor;
-}
-#drawLayers {
-  position: fixed;
-  right: 0;
-  width: 260px;
-  height: 100%;
-}
-#drawLayers ul {
-  list-style: none;
-  padding-left: 0;
-}
-#drawLayers ul .name {
-  vertical-align: middle;
-}
+
 @media print {
-  #drawLayers {
-    display: none;
-  }
+    #drawTools {
+        display: none;
+    }
+}
+
+#drawTools .activeColor {
+    width: 30px;
+    height: 30px;
+}
+
+.colorpicker {
+    margin: 20px 0 30px 0;
+}
+
+    .colorpicker .slider {
+        /*@gradient: left, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120,100%, 50%), hsl(180, 100%, 50%), hsl(240,100%,50%),hsl(300,100%,50%);*/
+        width: 150px;
+        height: 15px;
+        margin: 0 auto;
+        background: -webkit-linear-gradient(left, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+        background: -moz-linear-gradient(left, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+        background: -ms-linear-gradient(left, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+        background: linear-gradient(left, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+    }
+
+        .colorpicker .slider + input {
+            display: block;
+            width: 160px;
+            margin: 0 auto;
+        }
+
+    .colorpicker .chooser {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+        cursor: crosshair;
+        background-color: hsl(attr(data-hue number), 50%, 100%);
+        background-image: url(../img/cp_overlay.png);
+    }
+
+#surfaceContainer {
+    position: fixed;
+    left: 230px;
+    width: -webkit-calc(100% - 490px);
+    width: calc(100% - 490px);
+    height: 100%;
+    margin: 0 auto;
+    overflow: auto;
+}
+
+#drawSurface {
+    position: relative;
+    margin: 0 auto;
+    -ms-touch-action: none;
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    background-image: -webkit-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), -webkit-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
+    background-image: -moz-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), -moz-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
+    background-image: -ms-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), -ms-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
+    background-image: -o-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), -o-linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
+    background-image: linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee), linear-gradient(45deg, #eeeeee 25%, transparent 25%, transparent 75%, #eeeeee 75%, #eeeeee);
+}
+
+    #drawSurface canvas {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        image-rendering: -o-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: -moz-optimize-contrast;
+        -ms-interpolation-mode: nearest-neighbor;
+    }
+
+#drawLayers {
+    position: fixed;
+    right: 0;
+    width: 260px;
+    height: 100%;
+}
+
+    #drawLayers ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+        #drawLayers ul .name {
+            vertical-align: middle;
+        }
+
+@media print {
+    #drawLayers {
+        display: none;
+    }
 }

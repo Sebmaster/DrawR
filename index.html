@@ -9,12 +9,12 @@
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
-    
+
     <script src="js/canvas-toBlob.js" defer="defer"></script>
     <script src="js/filesaver.js" defer="defer"></script>
     <script src="js/jquery.js" defer="defer"></script>
     <script src="js/angular.js" defer="defer"></script>
-    
+
     <script src="js/drawr/general.js" defer="defer"></script>
     <script src="js/drawr/utilities.js" defer="defer"></script>
     <script src="js/drawr/io.js" defer="defer"></script>
@@ -26,27 +26,34 @@
 
 <body data-ng-controller="DrawCtrl">
     <div id="headerTools" class="btn-toolbar">
-        <button class="btn" data-ng-click="newCanvas()"><img src="img/icons/page_white_add.png"></button>
-    	<div class="btn-group">
-        	<button class="btn" data-ng-click="save()"><img src="img/icons/disk.png"></button>
-        	<button class="btn dropdown-toggle" data-toggle="dropdown">
-        		<span class="caret"></span>
-        	</button>
-        	<ul class="dropdown-menu">
-        		<li><img class="btn" src="img/icons/disk.png" data-ng-click="save()"> Save as DrawR</li>
-        		<li><img class="btn" src="img/icons/disk.png" data-ng-click="download()"> Save as PNG</li>
-        	</ul>
-    	</div>
-        <button class="btn" data-ng-click="load()"><img src="img/icons/image.png"></button>
-        
+        <button class="btn" data-ng-click="newCanvas()">
+            <img src="img/icons/page_white_add.png"></button>
+        <div class="btn-group">
+            <button class="btn" data-ng-click="save()">
+                <img src="img/icons/disk.png"></button>
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <img class="btn" src="img/icons/disk.png" data-ng-click="save()">
+                    Save as DrawR</li>
+                <li>
+                    <img class="btn" src="img/icons/disk.png" data-ng-click="download()">
+                    Save as PNG</li>
+            </ul>
+        </div>
+        <button class="btn" data-ng-click="load()">
+            <img src="img/icons/image.png"></button>
+
         <span class="input-append">
-       		<input class="input input-mini" type="number" ng-model="scalePercent">
-       		<span class="add-on">%</span>
+            <input class="input input-mini" type="number" ng-model="scalePercent">
+            <span class="add-on">%</span>
         </span>
-        
+
         <span class="input-append">
-       		<input class="input input-mini" type="number" ng-model="drawR.rotation">
-       		<span class="add-on">°</span>
+            <input class="input input-mini" type="number" ng-model="drawR.rotation">
+            <span class="add-on">°</span>
         </span>
     </div>
 
@@ -78,7 +85,7 @@
                     </dd>
                     <dt>Min. Size:</dt>
                     <dd>
-                    	<input type="number" min="0" value="1" max="1" step="0.01" data-ng-model="drawR.drawStyle[drawR.drawMode].minLineWidth">
+                        <input type="number" min="0" value="1" max="1" step="0.01" data-ng-model="drawR.drawStyle[drawR.drawMode].minLineWidth">
                     </dd>
                 </dl>
                 <dl data-ng-switch-when="Brush">
@@ -104,7 +111,7 @@
 
         <div id="surfaceContainer">
             <div id="drawSurface"
-            	data-ng-style="{
+                data-ng-style="{
             		backgroundSize: (80 * scalePercent / 100) + 'px ' + (80 * scalePercent / 100) + 'px',
             		backgroundPosition: '0 0, ' + (80 * scalePercent / 200) + 'px ' + (80 * scalePercent / 200) + 'px',
             		height: (drawR.options.height * scalePercent / 100) + 'px',
@@ -129,7 +136,7 @@
                     </select>
                 </dd>
             </dl>
-        
+
             <div class="btn-group">
                 <img class="btn" src="img/icons/add.png" data-ng-click="addLayer()">
                 <img class="btn" src="img/icons/delete.png" data-ng-click="remove()">
