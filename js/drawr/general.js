@@ -191,10 +191,10 @@ DrawR.prototype.bindEvents = function () {
 			var x = evt.offsetX !== undefined ? evt.offsetX : evt.originalEvent.layerX;
 			var y = evt.offsetY !== undefined ? evt.offsetY : evt.originalEvent.layerY;
 			var target = jQuery(evt.target);
-			if (!target.is('canvas')) {
-				var offset = target.position();
-				x -= offset.left;
-				y -= offset.top;
+			if (!$this.surface.find(target).length) {
+				var offset = $this.surface.offset();
+				x = evt.pageX - offset.left;
+				y = evt.pageY - offset.top;
 			}
 
 			$this.touchMove({ x: x, y: y, identifier: -1, force: 0 });
