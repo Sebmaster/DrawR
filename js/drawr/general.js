@@ -188,8 +188,16 @@ DrawR.prototype.bindEvents = function () {
             if (!$this.modifyOperations[-1]) return;
 
             evt.preventDefault();
+            var x = evt.offsetX !== undefined ? evt.offsetX : evt.originalEvent.layerX;
+            var y = evt.offsetY !== undefined ? evt.offsetY : evt.originalEvent.layerY;
+            var target = jQuery(evt.target);
+            if (!target.is('canvas')) {
+                var offset = target.position();
+                x -= offset.left;
+                y -= offset.top;
+            }
 
-            $this.touchMove({ x: evt.offsetX !== undefined ? evt.offsetX : evt.originalEvent.layerX, y: evt.offsetY !== undefined ? evt.offsetY : evt.originalEvent.layerY, identifier: -1, force: 0 });
+            $this.touchMove({ x: x, y: y, identifier: -1, force: 0 });
         })
     }
 };
