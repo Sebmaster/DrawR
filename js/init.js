@@ -162,7 +162,7 @@ DrawCtrl.prototype.bindEvents = function ($scope) {
 };
 
 DrawCtrl.prototype.initSurface = function ($scope) {
-	$scope.drawR = new DrawR(jQuery('#drawSurface').empty());
+	$scope.drawR = new DrawR(jQuery('#drawSurface').empty(), jQuery('#surfaceContainer'));
 	$scope.drawR.layers[0].name = 'Background';
 
 	$scope.selectedLayer = $scope.drawR.layers[0];
